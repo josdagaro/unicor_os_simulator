@@ -104,7 +104,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		
 		if (text != null && destinationFile != null)
 		{
-			
+			//copiado
 		}
 		else 
 		{
