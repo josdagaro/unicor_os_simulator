@@ -44,4 +44,9 @@ public class Process extends Thread
 	{
 		return activity;
 	}
+	
+	public void run (short velocity)
+	{
+		
+	}
 }

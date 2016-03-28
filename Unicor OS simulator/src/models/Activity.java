@@ -3,6 +3,7 @@ package models;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class Activity /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
@@ -105,16 +106,34 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return text;
 	}
 	
-	public short copyAndPaste (short velocity) throws IOException
+	public synchronized short copyAndPaste (short velocity, Process process) throws IOException, InterruptedException
 	{		
 		String text = readRootFile ();
 		File destinationFile = getDestinationFileIfExists ();
+		FileWriter writer = null;
+		long size = 0;
+		char [] letters = null;
+		int time = 0;
 					
 		short eventIdentifier = 0;
 		
 		if (text != null && destinationFile != null)
-		{
-		
+		{			
+			size = text.length ();
+			letters = text.toCharArray ();
+			writer = new FileWriter (destinationFile);
+			
+			for (int i = 0; i < size; i ++)
+			{
+				writer.append (letters [i]);
+				Thread.sleep (velocity); //se espera el tiempo indicado entre copiado de caracter
+				time += velocity;
+				
+				/*la idea es pasar por parametro al mismo proceso para que el quantum del mismo se compare
+				  y de esta manera poder detener el proceso (Thread) y reiniciar time en 0 con if y else*/
+			}
+			
+			writer.close ();
 		}
 		else 
 		{
