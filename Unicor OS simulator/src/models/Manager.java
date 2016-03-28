@@ -31,7 +31,7 @@ public class Manager
 		return stopQueue;
 	}
 	
-	public void init ()
+	public void init () //metodo para inicializar como nueva la lista y colas 
 	{
 		if (readyQueue != null)
 		{
