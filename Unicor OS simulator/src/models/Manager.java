@@ -5,20 +5,25 @@ import java.util.Queue;
 
 public class Manager 
 {
-	private short velocity; //tiempo de espera para cada thread en milisegundos para copiar cada caracter
+	private int velocity; //tiempo de espera para cada thread en milisegundos para copiar cada caracter
 	private Queue <Process> readyQueue; //cola de procesos listos
 	private Queue <Process> stopQueue; //cola de procesos detenidos
 	private LinkedList <Process> listOfCompleted; //lista de procesos terminados
 	
-	public Manager (short velocity)
+	public Manager (int velocity)
 	{
 		setVelocity (velocity);
 		init ();
 	}
 	
-	public void setVelocity (short velocity)
+	public void setVelocity (int velocity)
 	{
 		this.velocity = velocity;
+	}
+	
+	public int getVelocity ()
+	{
+		return velocity;
 	}
 	
 	public Queue <Process> getReadyQueue ()

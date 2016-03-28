@@ -106,7 +106,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return text;
 	}
 	
-	public synchronized short copyAndPaste (short velocity, float quantum) throws IOException, InterruptedException
+	public synchronized short copyAndPaste (int velocity, float quantum) throws IOException, InterruptedException
 	{		
 		String text = readRootFile ();
 		File destinationFile = getDestinationFileIfExists ();

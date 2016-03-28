@@ -47,8 +47,8 @@ public class Process extends Thread
 		return activity;
 	}
 	
-	public void run (short velocity) throws IOException, InterruptedException
+	public void run (int velocity) throws IOException, InterruptedException
 	{
-		getActivity ().copyAndPaste (velocity, getQuantum ());
+		getActivity ().copyAndPaste (velocity, getQuantum ());		
 	}
 }
