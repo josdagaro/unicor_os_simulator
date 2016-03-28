@@ -106,7 +106,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return text;
 	}
 	
-	public synchronized short copyAndPaste (short velocity, Process process) throws IOException, InterruptedException
+	public synchronized short copyAndPaste (short velocity, float quantum) throws IOException, InterruptedException
 	{		
 		String text = readRootFile ();
 		File destinationFile = getDestinationFileIfExists ();
@@ -114,6 +114,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		long size = 0;
 		char [] letters = null;
 		int time = 0;
+		float limit = quantum * 1000;
 					
 		short eventIdentifier = 0;
 		
@@ -125,12 +126,17 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 			
 			for (int i = 0; i < size; i ++)
 			{
-				writer.append (letters [i]);
-				Thread.sleep (velocity); //se espera el tiempo indicado entre copiado de caracter
-				time += velocity;
-				
-				/*la idea es pasar por parametro al mismo proceso para que el quantum del mismo se compare
-				  y de esta manera poder detener el proceso (Thread) y reiniciar time en 0 con if y else*/
+				if (time < limit) //limit es el quantum expresado en milisegundos
+				{
+					writer.append (letters [i]);
+					Thread.sleep (velocity); //se espera el tiempo indicado entre copiado de caracter
+					time += velocity;
+				}
+				else //si time llega a ser igual al quantum, entonces se reinicia time a cero y se detiene el proceso de copiado con la funcion wait
+				{
+					time = 0;
+					this.wait (); //el objeto de tipo Activity va a esperar que la funcion notify se llame para reanudar su proceso
+				}				
 			}
 			
 			writer.close ();

@@ -1,5 +1,7 @@
 package models;
 
+import java.io.IOException;
+
 public class Process extends Thread 
 {
 	private short pid; //identificación del proceso	
@@ -45,8 +47,8 @@ public class Process extends Thread
 		return activity;
 	}
 	
-	public void run (short velocity)
+	public void run (short velocity) throws IOException, InterruptedException
 	{
-		
+		getActivity ().copyAndPaste (velocity, getQuantum ());
 	}
 }
