@@ -49,13 +49,23 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return rootFile;
 	}
 	
-	private File getDestinationFileIfExists ()
+	private File getDestinationFileIfExists () throws IOException //metodo para validar la existencia del archivo destino, si no existe, lo crea, pero si ya hay uno con ese nombre, retorna null
 	{
 		File destinationFile = new File (getDestinationPath ());
 		
 		if (!destinationFile.exists ())
 		{
-			destinationFile = null;
+			try 
+			{
+				if (!destinationFile.createNewFile ())
+				{
+					destinationFile = null;
+				}
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		return destinationFile;
@@ -104,7 +114,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		
 		if (text != null && destinationFile != null)
 		{
-			//esto es un comentario de prueba para git push
+		
 		}
 		else 
 		{
