@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import models.Activity;
 import models.FileSelector;
@@ -46,9 +47,9 @@ public class FormController implements ActionListener, KeyListener
 		form.getCancelButton ().addActionListener (this);			
 		form.getPidField ().addKeyListener (this);
 		form.getNameField ().addKeyListener (this);
-		form.getQuantumField ().addKeyListener (this);
-		form.getRootFileField ().addKeyListener (this);
-		form.getDestinationFileField ().addKeyListener (this);
+		form.getQuantumField ().addKeyListener (this);		
+		form.getRootFileField ().setEnabled (false);
+		form.getDestinationFileField ().setEnabled (false);
 	}
 	
 	@Override
@@ -72,17 +73,26 @@ public class FormController implements ActionListener, KeyListener
 				break;
 				
 			case saveButton:
-				activity = new Activity (form.getRootFileField ().getText (), form.getDestinationFileField ().getText ());
 				
-				process = new Process 
-				(
-					Integer.parseInt (form.getPidField ().getText ()), form.getNameField ().getText (), Float.parseFloat (form.getQuantumField ().getText ()),
-					activity
-				);
+				if (!manager.validateExistenceByPid (Integer.parseInt (form.getPidField ().getText ())))
+				{
+					activity = new Activity (form.getRootFileField ().getText (), form.getDestinationFileField ().getText ());
+					
+					process = new Process 
+					(
+						Integer.parseInt (form.getPidField ().getText ()), form.getNameField ().getText (), Float.parseFloat (form.getQuantumField ().getText ()),
+						activity
+					);
+					
+					manager.getReadyQueue ().add (process);
+					clearFields ();
+					form.dispose ();
+				}
+				else
+				{
+					JOptionPane.showMessageDialog (null, "El PID que intenta registrar ya se encuentra en uso");
+				}
 				
-				manager.getReadyQueue ().add (process);
-				clearFields ();
-				form.dispose ();
 				break;
 				
 			case cancelButton:
@@ -120,7 +130,8 @@ public class FormController implements ActionListener, KeyListener
 			form.getPidField ().getText ().equals ("") || form.getNameField ().getText ().equals ("") || 
 			form.getQuantumField ().getText ().equals ("") || form.getRootFileField ().getText ().equals ("") || 
 			form.getDestinationFileField ().getText ().equals ("") || 
-			form.getRootFileField ().getText ().equals (form.getDestinationFileField ().getText ())
+			form.getRootFileField ().getText ().equals (form.getDestinationFileField ().getText ()) || !isNumeric (form.getPidField ().getText ()) ||
+			!isNumeric (form.getQuantumField ().getText ())
 		)
 		{	
 			check = false;
@@ -150,6 +161,11 @@ public class FormController implements ActionListener, KeyListener
 		form.getRootFileField ().setText (null);
 		form.getDestinationFileField ().setText (null);
 		form.getSaveButton ().setEnabled (false);
+	}
+	
+	private boolean isNumeric (String chain) 
+	{
+		return (chain.matches ("[+-]?\\d*(\\.\\d+)?"));
 	}
 
 	@Override

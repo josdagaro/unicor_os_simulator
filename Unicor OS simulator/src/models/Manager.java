@@ -36,25 +36,79 @@ public class Manager
 		return stopQueue;
 	}
 	
+	public LinkedList <Process> getListOfCompleted ()
+	{
+		return listOfCompleted;
+	}
+	
 	public void init () //metodo para inicializar como nueva la lista y colas 
 	{
-		if (readyQueue != null)
+		if (getReadyQueue () != null)
 		{
-			readyQueue.clear ();
+			getReadyQueue ().clear ();
 		}
 		
-		if (stopQueue != null) 
+		if (getStopQueue () != null) 
 		{
-			stopQueue.clear ();
+			getStopQueue ().clear ();
 		}
 		
-		if (listOfCompleted != null)
+		if (getListOfCompleted () != null)
 		{
-			listOfCompleted.clear ();
+			getListOfCompleted ().clear ();
 		}
 		
 		readyQueue = new LinkedList <Process> ();
 		stopQueue = new LinkedList <Process> ();
 		listOfCompleted = new LinkedList <Process> ();
+	}
+	
+	public boolean validateExistenceByPid (int pid) 
+	{
+		boolean check = false;
+		
+		if (searchAProcessByPid (pid, getReadyQueue ()))
+		{
+			check = true;
+		}
+		else if (searchAProcessByPid (pid, getStopQueue ()))
+		{
+			check = true;
+		}
+		else if (searchAProcessByPid (pid, getListOfCompleted ()))
+		{
+			check = true;
+		}
+		
+		return check;
+	}
+	
+	private boolean searchAProcessByPid (int pid, Queue <Process> queue)
+	{
+		boolean check = false;
+		Queue <Process> temporalQueue = new LinkedList <Process> ();
+		Process process = null;
+		
+		if (!queue.isEmpty ())
+		{
+			while (!queue.isEmpty ())
+			{
+				temporalQueue.add (queue.poll ());
+				process = temporalQueue.peek ();
+				
+				if (process.getPid () == pid)
+				{
+					check = true;
+					break;
+				}
+			}
+			
+			while (!temporalQueue.isEmpty ())
+			{
+				queue.add (temporalQueue.poll ());
+			}
+		}		
+			
+		return check;
 	}
 }
