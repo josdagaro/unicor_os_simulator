@@ -1,21 +1,18 @@
 package views;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.GridLayout;
 import javax.swing.border.TitledBorder;
-
-import models.FileSelector;
-
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.InputMethodEvent;
 
 public class Form extends JFrame 
 {
@@ -63,6 +60,7 @@ public class Form extends JFrame
 		JLabel lblQuantum = new JLabel ("Quantum:");
 		contentPane.add (lblQuantum);		
 		quantumField = new JTextField ();
+		quantumField.setText("10");
 		contentPane.add (quantumField);
 		quantumField.setColumns (10);		
 		panel = new JPanel ();
@@ -100,19 +98,9 @@ public class Form extends JFrame
 		return pidField;
 	}
 
-	public void setPidField (JTextField pidField) 
-	{
-		this.pidField = pidField;
-	}
-
 	public JTextField getNameField () 
 	{
 		return nameField;
-	}
-
-	public void setNameField (JTextField nameField) 
-	{
-		this.nameField = nameField;
 	}
 
 	public JTextField getQuantumField () 
@@ -120,19 +108,9 @@ public class Form extends JFrame
 		return quantumField;
 	}
 
-	public void setQuantumField (JTextField quantumField) 
-	{
-		this.quantumField = quantumField;
-	}
-
 	public JTextField getRootFileField () 
 	{
 		return rootFileField;
-	}
-
-	public void setRootFileField (JTextField rootFileField) 
-	{
-		this.rootFileField = rootFileField;
 	}
 
 	public JTextField getDestinationFileField () 
@@ -140,29 +118,14 @@ public class Form extends JFrame
 		return destinationFileField;
 	}
 
-	public void setDestinationFileField (JTextField destinationFileField) 
-	{
-		this.destinationFileField = destinationFileField;
-	}
-
 	public JButton getRootFileButton () 
 	{
 		return rootFileButton;
 	}
-
-	public void setRootFileButton (JButton rootFileButton) 
-	{
-		this.rootFileButton = rootFileButton;
-	}
-
+	
 	public JButton getDestinationFileButton () 
 	{
 		return destinationFileButton;
-	}
-
-	public void setDestinationFileButton (JButton destinationFileButton) 
-	{
-		this.destinationFileButton = destinationFileButton;
 	}
 
 	public JButton getSaveButton () 
@@ -170,18 +133,8 @@ public class Form extends JFrame
 		return saveButton;
 	}
 
-	public void setSaveButton (JButton saveButton) 
-	{
-		this.saveButton = saveButton;
-	}
-
 	public JButton getCancelButton () 
 	{
 		return cancelButton;
-	}
-
-	public void setCancelButton (JButton cancelButton) 
-	{
-		this.cancelButton = cancelButton;
-	}
+	}	
 }
