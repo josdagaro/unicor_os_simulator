@@ -9,10 +9,6 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.FlowLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.InputMethodListener;
-import java.awt.event.InputMethodEvent;
 
 public class Form extends JFrame 
 {
@@ -41,6 +37,7 @@ public class Form extends JFrame
 	 */
 	public Form () 
 	{
+		setResizable (false);
 		setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
 		setBounds (100, 100, 385, 371);
 		contentPane = new JPanel ();

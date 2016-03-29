@@ -1,8 +1,6 @@
 package controllers;
 
-import java.awt.EventQueue; import models.Manager;
-
-import views.Form;
+import java.awt.EventQueue;
 
 public class Main 
 {
@@ -16,7 +14,7 @@ public class Main
 				{
 					try 
 					{
-						new FormController (new Manager (100));						
+						new MainWindow ();						
 					} 
 					catch (Exception e) 
 					{

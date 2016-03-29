@@ -51,4 +51,11 @@ public class Process extends Thread
 	{
 		getActivity ().copyAndPaste (velocity, getQuantum ());		
 	}
+	
+	public float getRafagaTime (int velocity) throws IOException
+	{
+		float rafagaTime = 0;
+		rafagaTime = velocity * getActivity ().getNumberOfCharacters ();
+		return rafagaTime;
+	}
 }

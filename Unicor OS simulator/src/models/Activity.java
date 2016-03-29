@@ -161,4 +161,17 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		
 		return eventIdentifier;
 	}
+	
+	public long getNumberOfCharacters () throws IOException
+	{
+		String text = readRootFile ();
+		long size = 0;
+		
+		if (text != null)
+		{
+			size = text.length ();			
+		}
+		
+		return size;
+	}
 }

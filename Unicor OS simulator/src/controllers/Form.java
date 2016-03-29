@@ -12,26 +12,24 @@ import models.FileSelector;
 import models.Manager;
 import models.Process;
 
-import views.Form;
-
-public class FormController implements ActionListener, KeyListener
+public class Form implements ActionListener, KeyListener
 {
-	private Form form;
+	private views.Form form;
 	private Manager manager;
 		
-	public FormController (Manager manager)
+	public Form (Manager manager)
 	{
-		this.form = new Form ();	
+		this.form = new views.Form ();	
 		this.manager = manager;
 		initForm ();
 	}
 	
-	public enum formComponents
+	private enum formComponents
 	{
 		rootFileButton, destinationFileButton, saveButton, cancelButton
 	}
 	
-	public void initForm () 
+	private void initForm () 
 	{
 		form.setTitle ("Agregar proceso");
 		form.setLocationRelativeTo (null);
@@ -124,14 +122,15 @@ public class FormController implements ActionListener, KeyListener
 	private boolean validateFields () //se valida que ningún campo de texto esté vacio, incluyendo que la ruta de archivo fuente sea distinta del archivo destino
 	{
 		boolean check = true;
+		Global global = new Global ();
 		
 		if 
 		(   
 			form.getPidField ().getText ().equals ("") || form.getNameField ().getText ().equals ("") || 
 			form.getQuantumField ().getText ().equals ("") || form.getRootFileField ().getText ().equals ("") || 
 			form.getDestinationFileField ().getText ().equals ("") || 
-			form.getRootFileField ().getText ().equals (form.getDestinationFileField ().getText ()) || !isNumeric (form.getPidField ().getText ()) ||
-			!isNumeric (form.getQuantumField ().getText ())
+			form.getRootFileField ().getText ().equals (form.getDestinationFileField ().getText ()) || !global.isNumeric (form.getPidField ().getText ()) ||
+			!global.isNumeric (form.getQuantumField ().getText ())
 		)
 		{	
 			check = false;
@@ -161,11 +160,6 @@ public class FormController implements ActionListener, KeyListener
 		form.getRootFileField ().setText (null);
 		form.getDestinationFileField ().setText (null);
 		form.getSaveButton ().setEnabled (false);
-	}
-	
-	private boolean isNumeric (String chain) 
-	{
-		return (chain.matches ("[+-]?\\d*(\\.\\d+)?"));
 	}
 
 	@Override

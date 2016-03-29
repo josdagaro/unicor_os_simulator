@@ -9,6 +9,7 @@ public class Manager
 	private Queue <Process> readyQueue; //cola de procesos listos
 	private Queue <Process> stopQueue; //cola de procesos detenidos
 	private LinkedList <Process> listOfCompleted; //lista de procesos terminados
+	private Process execution;
 	
 	public Manager (int velocity)
 	{
@@ -19,6 +20,11 @@ public class Manager
 	public void setVelocity (int velocity)
 	{
 		this.velocity = velocity;
+	}
+	
+	public void setExecution (Process execution)
+	{
+		this.execution = execution;
 	}
 	
 	public int getVelocity ()
@@ -39,6 +45,11 @@ public class Manager
 	public LinkedList <Process> getListOfCompleted ()
 	{
 		return listOfCompleted;
+	}
+	
+	public Process getExecution ()
+	{
+		return execution;
 	}
 	
 	public void init () //metodo para inicializar como nueva la lista y colas 
