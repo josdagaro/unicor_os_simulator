@@ -80,18 +80,44 @@ public class FormController implements ActionListener, KeyListener
 	public void chooseFile (JTextField textField) //se ejecuta una ventana para seleccionar un archivo
 	{
 		FileSelector fileSelector = new FileSelector ();
-		textField.setText (fileSelector.getFilePath ());
+		String path = fileSelector.getFilePath ();
+		
+		if (path != null && !path.equals (""))
+		{
+			textField.setText (path);
+			if (validateFields ())
+			{
+				form.getSaveButton ().setEnabled (true);
+			}
+			else
+			{
+				form.getSaveButton ().setEnabled (false);
+			}
+		}
+	}
+	
+	private boolean validateFields ()
+	{
+		boolean check = true;
+		
+		if 
+		(   
+			form.getPidField ().getText ().equals ("") || form.getNameField ().getText ().equals ("") || 
+			form.getQuantumField ().getText ().equals ("") || form.getRootFileField ().getText ().equals ("") || 
+			form.getDestinationFileField ().getText ().equals ("") || 
+			form.getRootFileField ().getText ().equals (form.getDestinationFileField ().getText ())
+		)
+		{	
+			check = false;
+		}
+		
+		return check;
 	}
 
 	@Override
 	public void keyPressed (KeyEvent e) //se valida que ningún campo de texto esté vacio
 	{
-		if 
-		(   
-			form.getPidField ().getText ().equals ("") || form.getNameField ().getText ().equals ("") || 
-			form.getQuantumField ().getText ().equals ("") || form.getRootFileField ().getText ().equals ("") || 
-			form.getDestinationFileField ().getText ().equals ("")
-		)
+		if (!validateFields ())
 		{			
 			form.getSaveButton ().setEnabled (false);
 		}
@@ -99,7 +125,7 @@ public class FormController implements ActionListener, KeyListener
 		{
 			form.getSaveButton ().setEnabled (true);
 		}
-	}
+	}	
 
 	@Override
 	public void keyTyped (KeyEvent e) 
