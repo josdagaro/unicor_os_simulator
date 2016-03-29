@@ -55,6 +55,10 @@ public class FormController implements ActionListener, KeyListener
 	public void actionPerformed (ActionEvent event) //evento multi-caso en el cual se ejecuta una acción distinta dependiendo del botón presionado  
 	{
 		// TODO Auto-generated method stub
+		
+		Activity activity = null;
+		Process process = null;
+		
 		switch (formComponents.valueOf (event.getActionCommand ()))
 		{
 			case rootFileButton:
@@ -68,6 +72,17 @@ public class FormController implements ActionListener, KeyListener
 				break;
 				
 			case saveButton:
+				activity = new Activity (form.getRootFileField ().getText (), form.getDestinationFileField ().getText ());
+				
+				process = new Process 
+				(
+					Integer.parseInt (form.getPidField ().getText ()), form.getNameField ().getText (), Float.parseFloat (form.getQuantumField ().getText ()),
+					activity
+				);
+				
+				manager.getReadyQueue ().add (process);
+				clearFields ();
+				form.dispose ();
 				break;
 				
 			case cancelButton:
@@ -96,7 +111,7 @@ public class FormController implements ActionListener, KeyListener
 		}
 	}
 	
-	private boolean validateFields ()
+	private boolean validateFields () //se valida que ningún campo de texto esté vacio, incluyendo que la ruta de archivo fuente sea distinta del archivo destino
 	{
 		boolean check = true;
 		
@@ -115,7 +130,7 @@ public class FormController implements ActionListener, KeyListener
 	}
 
 	@Override
-	public void keyPressed (KeyEvent e) //se valida que ningún campo de texto esté vacio
+	public void keyPressed (KeyEvent e) //cada vez que se presione una tecla, en cualquiera de los campos, se validan todos los campos
 	{
 		if (!validateFields ())
 		{			
@@ -126,6 +141,16 @@ public class FormController implements ActionListener, KeyListener
 			form.getSaveButton ().setEnabled (true);
 		}
 	}	
+	
+	private void clearFields ()
+	{
+		form.getPidField ().setText (null);
+		form.getNameField ().setText (null);
+		form.getQuantumField ().setText (null);
+		form.getRootFileField ().setText (null);
+		form.getDestinationFileField ().setText (null);
+		form.getSaveButton ().setEnabled (false);
+	}
 
 	@Override
 	public void keyTyped (KeyEvent e) 

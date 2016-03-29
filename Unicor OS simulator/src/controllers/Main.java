@@ -16,8 +16,7 @@ public class Main
 				{
 					try 
 					{
-						new FormController (null);
-
+						new FormController (new Manager (100));						
 					} 
 					catch (Exception e) 
 					{

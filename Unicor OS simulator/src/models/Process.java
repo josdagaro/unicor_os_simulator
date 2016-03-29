@@ -4,12 +4,12 @@ import java.io.IOException;
 
 public class Process extends Thread 
 {
-	private short pid; //identificación del proceso	
+	private int pid; //identificación del proceso	
 	private float quantum; //tiempo en segundos en uso CPU
 	private Activity activity; /*actividad del proceso, contiene ruta fuente (copiado) y destino (pegado)
 	 							 como también las funciones necesarias para realizar dicha tarea*/
 	
-	public Process (short pid, String name, float quantum, Activity activity)
+	public Process (int pid, String name, float quantum, Activity activity)
 	{
 		setPid (pid);
 		setName (name); //metodos setName () y getName () heredados de la clase Thread
@@ -17,7 +17,7 @@ public class Process extends Thread
 		setActivity (activity);
 	}
 	
-	public void setPid (short pid)
+	public void setPid (int pid)
 	{
 		this.pid = pid;
 	}	
@@ -32,7 +32,7 @@ public class Process extends Thread
 		this.activity = activity;
 	}
 	
-	public short getPid ()
+	public int getPid ()
 	{
 		return pid;
 	}	
