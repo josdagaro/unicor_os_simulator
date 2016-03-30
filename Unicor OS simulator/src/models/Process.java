@@ -47,9 +47,9 @@ public class Process extends Thread
 		return activity;
 	}
 	
-	public void run (int velocity) throws IOException, InterruptedException
+	public void run (int velocity, views.MainWindow mainWindow) throws IOException, InterruptedException
 	{
-		getActivity ().copyAndPaste (velocity, getQuantum ());		
+		getActivity ().copyAndPaste (velocity, this, mainWindow);
 	}
 	
 	public float getRafagaTime (int velocity) throws IOException

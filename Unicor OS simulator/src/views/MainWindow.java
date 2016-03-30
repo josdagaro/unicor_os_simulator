@@ -32,6 +32,7 @@ public class MainWindow extends JFrame
 	private JButton rebootButton;
 	private JButton createButton;
 	private JButton addVelocityButton;
+	private JProgressBar progressBar;
 
 	/**
 	 * Create the frame.
@@ -68,10 +69,10 @@ public class MainWindow extends JFrame
 		panel_5.add (nameLabel);		
 		progressLabel = new JLabel ("Progreso:");
 		panel_5.add (progressLabel);		
-		JProgressBar progressBar = new JProgressBar ();
+		progressBar = new JProgressBar ();
 		panel_5.add (progressBar);		
 		JPanel panel_2 = new JPanel ();
-		panel_2.setBorder (new TitledBorder (null, "Controllers", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBorder (new TitledBorder (new LineBorder (new Color (184, 207, 229)), "Controles", TitledBorder.LEADING, TitledBorder.TOP, null, new Color (51, 51, 51)));
 		panel.add (panel_2);		
 		panel_2.setLayout (new GridLayout (1, 0, 100, 0));		
 		toggleButton = new JButton ("Iniciar");
@@ -119,7 +120,7 @@ public class MainWindow extends JFrame
 		return pidLabel;
 	}
 
-	public JLabel getNameLabe () 
+	public JLabel getNameLabel () 
 	{
 		return nameLabel;
 	}
@@ -147,5 +148,10 @@ public class MainWindow extends JFrame
 	public JButton getAddVelocityButton () 
 	{
 		return addVelocityButton;
+	}
+	
+	public JProgressBar getProgressBar ()
+	{
+		return progressBar;
 	}
 }

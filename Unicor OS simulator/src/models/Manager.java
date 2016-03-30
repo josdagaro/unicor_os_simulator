@@ -14,6 +14,7 @@ public class Manager
 	public Manager (int velocity)
 	{
 		setVelocity (velocity);
+		setExecution (null);
 		init ();
 	}
 	

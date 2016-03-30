@@ -2,6 +2,7 @@ package controllers;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -45,30 +46,65 @@ public class MainWindow implements ActionListener
 	public void actionPerformed (ActionEvent event) 
 	{
 		Global global = null;
+		int size = 0;
 
 		// TODO Auto-generated method stub
 		switch (mainWindowComponents.valueOf (event.getActionCommand ()))
 		{
 			case toggleButton:
 				
-				
+				if (mainWindow.getToggleButton ().getText ().equals ("Iniciar"))
+				{
+					mainWindow.getToggleButton ().setText ("Detener");
+					
+					try 
+					{
+						startProcessing ();
+					} 
+					catch (IOException | InterruptedException exception) 
+					{
+						// TODO Auto-generated catch block
+						exception.printStackTrace();
+					}
+				}
+				else
+				{
+					mainWindow.getToggleButton ().setText ("Iniciar");
+				}							
+					
 				break;
 			
 			case rebootButton:
 				
+				size = mainWindow.getTable ().getRowCount ();
+				
+				for (int i = 0; i < size; i ++)
+				{
+					((DefaultTableModel) mainWindow.getTable ().getModel ()).removeRow (0);
+				}	
+				
+				mainWindow.getToggleButton ().setEnabled (false);
+				mainWindow.getCreateButton ().setEnabled (false);
+				mainWindow.getVelocityField ().setEnabled (true);
+				mainWindow.getVelocityField ().setText (null);
+				mainWindow.getPidLabel ().setText ("PID:");
+				mainWindow.getNameLabel ().setText ("Nombre:");
+				mainWindow.getProgressLabel ().setText ("Progreso:");
+				mainWindow.getProgressBar ().setValue (0);
 				
 				break;
 				
 			case createButton:
 				
-				new Form (manager, mainWindow);													
+				new Form (manager, mainWindow);		
+				mainWindow.setEnabled (false);
 				break;
 				
 			case addVelocityButton:
 				
 				global = new Global ();
 				
-				if (global.isNumeric (mainWindow.getVelocityField ().getText ()))
+				if (!mainWindow.getVelocityField ().getText ().equals ("") && global.isNumeric (mainWindow.getVelocityField ().getText ()))
 				{
 					manager = new Manager (Integer.parseInt (mainWindow.getVelocityField ().getText ()));
 					mainWindow.getVelocityField ().setEnabled (false);
@@ -116,5 +152,41 @@ public class MainWindow implements ActionListener
 		};
 		
 		return model;
+	}
+	
+	private void startProcessing () throws IOException, InterruptedException
+	{
+		models.Process process = null;
+		int velocity = manager.getVelocity ();
+		
+		while (true)
+		{
+			if (!manager.getReadyQueue ().isEmpty ())
+			{
+				process = manager.getReadyQueue ().poll ();
+				
+				if (manager.getExecution () == null)
+				{
+					mainWindow.getPidLabel ().setText ("PID: " + String.valueOf (process.getPid ()));
+					mainWindow.getNameLabel ().setText ("Nombre: " + process.getName ());
+					manager.setExecution (process); //De listo a ejecución
+					manager.getExecution().start();
+					manager.getExecution ().run (velocity, mainWindow);
+					
+					if (manager.getExecution ().isInterrupted ())
+					{
+						JOptionPane.showMessageDialog (null, "interrumpido");
+					}
+					else
+					{
+						JOptionPane.showMessageDialog (null, "NO interrumpido");
+					}
+				}								
+			}
+			else
+			{
+				break;
+			}
+		}
 	}
 }

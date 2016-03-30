@@ -108,6 +108,7 @@ public class Form implements ActionListener, KeyListener
 					}
 					
 					mainWindow.getToggleButton ().setEnabled (true);
+					mainWindow.setEnabled (true);
 					form.dispose ();
 				}
 				else
