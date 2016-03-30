@@ -15,7 +15,7 @@ public class MainWindow implements ActionListener
 	
 	public MainWindow ()
 	{
-		mainWindow = new views.MainWindow ();
+		mainWindow = new views.MainWindow (getTableModel ());
 		manager = null;
 		initForm ();
 	}
@@ -26,24 +26,68 @@ public class MainWindow implements ActionListener
 	}
 	
 	private void initForm ()
-	{
-		DefaultTableModel model = null;
-		String [] header = {"PID", "Nombre", "Ráfaga", "Quantum", "Estado", "Tiempo de llegada"};
+	{		
 		mainWindow.setLocationRelativeTo (null);
 		mainWindow.setVisible (true);
 		mainWindow.getToggleButton ().setEnabled (false);
 		mainWindow.getToggleButton ().setActionCommand ("toggleButton");
 		mainWindow.getToggleButton ().addActionListener (this);
-		mainWindow.getRebootButton ().setEnabled (false);
 		mainWindow.getRebootButton ().setActionCommand ("rebootButton");
 		mainWindow.getRebootButton ().addActionListener (this);
 		mainWindow.getCreateButton ().setEnabled (false);
 		mainWindow.getCreateButton ().setActionCommand ("createButton");
 		mainWindow.getCreateButton ().addActionListener (this);
 		mainWindow.getAddVelocityButton ().setActionCommand ("addVelocityButton");
-		mainWindow.getAddVelocityButton ().addActionListener (this);
+		mainWindow.getAddVelocityButton ().addActionListener (this);		
+	}
+
+	@Override
+	public void actionPerformed (ActionEvent event) 
+	{
+		Global global = null;
+
+		// TODO Auto-generated method stub
+		switch (mainWindowComponents.valueOf (event.getActionCommand ()))
+		{
+			case toggleButton:
+				
+				
+				break;
+			
+			case rebootButton:
+				
+				
+				break;
+				
+			case createButton:
+				
+				new Form (manager, mainWindow);													
+				break;
+				
+			case addVelocityButton:
+				
+				global = new Global ();
+				
+				if (global.isNumeric (mainWindow.getVelocityField ().getText ()))
+				{
+					manager = new Manager (Integer.parseInt (mainWindow.getVelocityField ().getText ()));
+					mainWindow.getVelocityField ().setEnabled (false);
+					mainWindow.getCreateButton ().setEnabled (true);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog (null, "La velocidad especificada no es valida");
+				}
+				
+				break;
+		}
+	}
+	
+	private DefaultTableModel getTableModel ()
+	{
+		String [] header = {"PID", "Nombre", "Ráfaga", "Quantum", "Estado", "Tiempo de llegada"};
 		
-		model = new DefaultTableModel (new Object [][] {}, header)
+		DefaultTableModel model = new DefaultTableModel (new Object [][] {}, header)
 		{
 			/**
 			 * 
@@ -71,48 +115,6 @@ public class MainWindow implements ActionListener
 			}
 		};
 		
-		mainWindow.getTable ().setModel (model);
-	}
-
-	@Override
-	public void actionPerformed (ActionEvent event) 
-	{
-		Global global = null;
-		Form form = null;
-		// TODO Auto-generated method stub
-		switch (mainWindowComponents.valueOf (event.getActionCommand ()))
-		{
-			case toggleButton:
-				
-				
-				break;
-			
-			case rebootButton:
-				
-				
-				break;
-				
-			case createButton:
-				
-				form = new Form (manager);
-				break;
-				
-			case addVelocityButton:
-				
-				global = new Global ();
-				
-				if (global.isNumeric (mainWindow.getVelocityField ().getText ()))
-				{
-					manager = new Manager (Integer.parseInt (mainWindow.getVelocityField ().getText ()));
-					mainWindow.getVelocityField ().setEnabled (false);
-					mainWindow.getCreateButton ().setEnabled (true);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog (null, "La velocidad especificada no es valida");
-				}
-				
-				break;
-		}
+		return model;
 	}
 }

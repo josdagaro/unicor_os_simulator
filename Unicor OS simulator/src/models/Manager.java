@@ -94,7 +94,7 @@ public class Manager
 		return check;
 	}
 	
-	private boolean searchAProcessByPid (int pid, Queue <Process> queue)
+	public boolean searchAProcessByPid (int pid, Queue <Process> queue)
 	{
 		boolean check = false;
 		Queue <Process> temporalQueue = new LinkedList <Process> ();

@@ -5,11 +5,16 @@ import javax.swing.JPanel;
 import java.awt.GridLayout;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import java.awt.FlowLayout;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import java.awt.Font;
 
 public class MainWindow extends JFrame 
 {
@@ -31,7 +36,7 @@ public class MainWindow extends JFrame
 	/**
 	 * Create the frame.
 	 */
-	public MainWindow () 
+	public MainWindow (DefaultTableModel model) 
 	{
 		setResizable (false);		
 		setTitle ("Unicor OS simulator");
@@ -41,8 +46,12 @@ public class MainWindow extends JFrame
 		contentPane.setBorder(new TitledBorder (null, "Tabla de procesos", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setContentPane (contentPane);
 		contentPane.setLayout (new GridLayout (3, 0, 0, 10));		
-		table = new JTable ();		
-		contentPane.add (table);				
+		table = new JTable ();				
+		table.setFont(new Font("Dialog", Font.BOLD, 12));
+		table.setBorder(new LineBorder(new Color (0, 0, 0)));
+		table.setModel (model);
+		contentPane.add (table);
+		contentPane.add (new JScrollPane (table));
 		JPanel panel = new JPanel ();
 		contentPane.add (panel);
 		panel.setLayout (new GridLayout (2, 1, 0, 0));		

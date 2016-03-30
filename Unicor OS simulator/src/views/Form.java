@@ -37,6 +37,8 @@ public class Form extends JFrame
 	 */
 	public Form () 
 	{
+		setAlwaysOnTop (true);
+		setTitle ("Crear proceso");
 		setResizable (false);
 		setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
 		setBounds (100, 100, 385, 371);

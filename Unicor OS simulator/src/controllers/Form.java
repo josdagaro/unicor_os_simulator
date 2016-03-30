@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -12,15 +13,19 @@ import models.FileSelector;
 import models.Manager;
 import models.Process;
 
+import javax.swing.table.DefaultTableModel;
+
 public class Form implements ActionListener, KeyListener
 {
 	private views.Form form;
 	private Manager manager;
+	private views.MainWindow mainWindow;
 		
-	public Form (Manager manager)
+	public Form (Manager manager, views.MainWindow mainWindow)
 	{
 		this.form = new views.Form ();	
 		this.manager = manager;
+		this.mainWindow = mainWindow;
 		initForm ();
 	}
 	
@@ -57,6 +62,7 @@ public class Form implements ActionListener, KeyListener
 		
 		Activity activity = null;
 		Process process = null;
+		Object [] object = null;
 		
 		switch (formComponents.valueOf (event.getActionCommand ()))
 		{
@@ -83,7 +89,25 @@ public class Form implements ActionListener, KeyListener
 					);
 					
 					manager.getReadyQueue ().add (process);
-					clearFields ();
+					clearFields ();								
+					
+					try 
+					{
+						object = new Object [] 
+						{
+							process.getPid (), process.getName (), process.getRafagaTime (manager.getVelocity ()) / 1000,
+							process.getQuantum (), "Listo", 0
+						};
+						
+						((DefaultTableModel) mainWindow.getTable ().getModel ()).addRow (object);
+					} 
+					catch (IOException exception)
+					{
+						// TODO Auto-generated catch block
+						exception.printStackTrace ();
+					}
+					
+					mainWindow.getToggleButton ().setEnabled (true);
 					form.dispose ();
 				}
 				else
