@@ -52,9 +52,9 @@ public class Process extends Thread
 		return activity;
 	}
 
-	public void executeActivity (int velocity, views.MainWindow mainWindow) throws IOException, InterruptedException
+	public void executeActivity (int velocity, views.MainWindow mainWindow, Manager manager) throws IOException, InterruptedException
 	{
-		getActivity ().copyAndPaste (velocity, this, mainWindow);		
+		getActivity ().copyAndPaste (velocity, this, mainWindow, manager);		
 	}
 
 	public float getRafagaTime (int velocity) throws IOException

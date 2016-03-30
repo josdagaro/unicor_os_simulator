@@ -16,7 +16,7 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 import java.awt.Font;
 
-public class MainWindow extends JFrame 
+public class MainWindow extends JFrame
 {
 	/**
 	 * 

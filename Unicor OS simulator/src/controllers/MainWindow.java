@@ -84,31 +84,10 @@ public class MainWindow implements ActionListener
 			
 			case rebootButton:
 				
-				size = mainWindow.getTable ().getRowCount ();
-				
-				for (int i = 0; i < size; i ++)
-				{
-					((DefaultTableModel) mainWindow.getTable ().getModel ()).removeRow (0);
-				}	
-				
-				mainWindow.getToggleButton ().setEnabled (false);
-				mainWindow.getCreateButton ().setEnabled (false);
-				mainWindow.getVelocityField ().setEnabled (true);
-				mainWindow.getVelocityField ().setText (null);
-				mainWindow.getPidLabel ().setText ("PID:");
-				mainWindow.getNameLabel ().setText ("Nombre:");				
-				
-				if (manager.getExecution () != null)
-				{										
-					manager.getExecution ().getActivity ().suspendIt ();
-					manager.getExecution ().suspendIt ();
-					manager.suspendIt ();
-					manager = null;
-				}				
-				
-				mainWindow.getProgressLabel ().setText ("Progreso:");
-				mainWindow.getProgressBar ().setValue (0);
-				
+				mainWindow.dispose ();
+				mainWindow = new views.MainWindow (getTableModel ());
+				manager = null;
+				initForm ();				
 				break;
 				
 			case createButton:
@@ -194,9 +173,19 @@ public class MainWindow implements ActionListener
 					manager.setExecution (process); //De listo a ejecución
 					modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
 					manager.getExecution ().start ();
-					manager.getExecution ().executeActivity (velocity, mainWindow);
 					
+					synchronized (manager){
+					manager.getExecution ().executeActivity (velocity, mainWindow, manager);														
 					
+					if (!manager.getExecution ().isSuspended () || !manager.getExecution ().isCompleted ())
+					{
+						System.out.println ("¡No suspendido!");
+					}
+					else
+					{
+						System.out.println ("¡Suspendido!");
+					}
+					/*INTENTAR PASANDO MANAGER POR PARAMETRO PARA PASA A COLA DETENIDO ALLA EN ACTIVITY*/
 					/*while (true)
 					{
 						if (manager.getExecution ().isSuspended ())
@@ -226,9 +215,9 @@ public class MainWindow implements ActionListener
 							manager.setExecution (null);
 							liberation = false;
 							break;
-						}
-					}*/
-				}								
+						}*/
+					}
+				}	
 			}
 			else if (!manager.getStopQueue ().isEmpty ())
 			{

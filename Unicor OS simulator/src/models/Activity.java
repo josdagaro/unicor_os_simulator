@@ -1,69 +1,22 @@
 package models;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.swing.Timer;
-
-import controllers.Global;
-
-
-public class Activity extends Thread /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
-					                   de un archivo de texto a otro*/
+public class Activity /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
+					  de un archivo de texto a otro*/
 {
 	private String rootPath; //ruta del archivo que contiene los caracteres
 	private String destinationPath; //ruta del archivo destino en el cual se van a pegar los caracteres
-	private Global global;
-	private boolean suspended;
 	
 	public Activity (String rootPath, String destinationPath) 
 	{
 		setRootPath (rootPath);
 		setDestinationPath (destinationPath);
-		global = new Global ();
-		suspended = false;
 	}
-
-	public boolean isSuspended ()
-	{
-		return suspended;
-	}
-	
-	public void suspendIt ()
-	{
-		suspended = true;
-	}
-	
-	public synchronized void resumeIt ()
-	{
-		suspended = false;
-		notify ();
-	}
-	
-	public void run ()
-	{
-		try 
-		{
-			synchronized (this) 
-			{
-				while (suspended) 
-				{
-					wait ();
-				}
-			}
-		}
-		catch (InterruptedException e) 
-		{
-			e.printStackTrace ();
-		}
-	}
-	
-	
 	
 	public void setRootPath (String rootPath)
 	{
@@ -153,7 +106,8 @@ public class Activity extends Thread /*recibe el nombre ya que es una clase dise
 		return text;
 	}
 	
-	public void copyAndPaste (int velocity, Process process, views.MainWindow mainWindow) throws IOException, InterruptedException
+	public void copyAndPaste (int velocity, Process process, views.MainWindow mainWindow, Manager manager) throws IOException, 
+	InterruptedException
 	{		
 		String text = readRootFile ();
 		File destinationFile = getDestinationFileIfExists ();
@@ -163,78 +117,63 @@ public class Activity extends Thread /*recibe el nombre ya que es una clase dise
 		int time = 0;
 		float limit = process.getQuantum () * 1000;
 		float rafaga = 0;
+		String percentage = null;
 		
 		if (text != null && destinationFile != null)
 		{
 			size = text.length ();
-			global.setSize (size);
 			rafaga = size * velocity;
-			global.setRafaga (rafaga);
 			letters = text.toCharArray ();
-			global.setLetters (text);
 			writer = new FileWriter (destinationFile);
-			global.setWriter (writer);
-			global.setI (0);			
-			
-			Timer timer = new Timer
-			(
-				velocity, new ActionListener ()
-				{	
-					@Override
-					public void actionPerformed (ActionEvent event) 
-					{
-						// TODO Auto-generated method stub		
-						if (global.getI () < global.getSize ())
-						{	
-							//System.out.println ("Test");
-							
-							if (global.getTime () < limit)
-							{													
-								try 
-								{
-									global.getWriter ().append (global.getLetters ().toCharArray () [global.getI ()]);
-								} 
-								catch (IOException e) 
-								{
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}								
-								
-								global.setTime (global.getTime () + velocity);
-								mainWindow.getProgressBar ().setValue ((int) ((global.getI () * velocity * 100) / global.getRafaga ()));
-								global.setPercentage(String.valueOf ((int) ((global.getI () * velocity * 100) / global.getRafaga ())));	
-								mainWindow.getProgressLabel ().setText ("Progreso: " + global.getPercentage () + "%");
-								mainWindow.getProgressBar ().repaint ();
-							}
-							else
-							{								
-								process.suspendIt ();	
-								//global.setTime (0);
-							}
-							
-							global.setI (global.getI () + 1);
-						}
-						else
+					
+			for (int i = 0; i < size; i ++)
+			{	
+				//System.out.println ("Test");							
+				if (time < limit)
+				{													
+					try 
+					{						
+						writer.append (letters [i]);
+						//chronometer.initChronometer ();
+						for (int j = 0; j < velocity; j ++)
 						{
-							try 
-							{
-								global.getWriter ().close ();
-							} 
-							catch (IOException e) 
-							{
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-							process.completed ();							
+							Thread.sleep (1);							
 						}
-					}								
+						
+					} 
+					catch (IOException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}															
+					
+					time += velocity;
+					mainWindow.getProgressBar ().setValue ((int) ((i * velocity * 100) / rafaga));
+					percentage = new String (String.valueOf ((int) ((i * velocity * 100) / rafaga)));	
+					mainWindow.getProgressLabel ().setText ("Progreso: " + percentage + "%");
+					mainWindow.getProgressBar ().repaint ();
 				}
-			);		
+				else
+				{						
+					//manager.getStopQueue ().add (process);
+					//manager.setExecution (null);
+					process.suspendIt ();					
+					//global.setTime (0);
+				}										
+			}
 			
-			
-			timer.start ();
-	
+			try 
+			{
+				writer.close ();
+			} 
+			catch (IOException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+							
+			process.completed ();																					
+
 			
 			/*while (true)
 			{
