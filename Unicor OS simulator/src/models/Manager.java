@@ -3,19 +3,21 @@ package models;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Manager 
+public class Manager extends Thread
 {
 	private int velocity; //tiempo de espera para cada thread en milisegundos para copiar cada caracter
 	private Queue <Process> readyQueue; //cola de procesos listos
 	private Queue <Process> stopQueue; //cola de procesos detenidos
 	private LinkedList <Process> listOfCompleted; //lista de procesos terminados
 	private Process execution;
+	private boolean suspended;
 	
 	public Manager (int velocity)
 	{
 		setVelocity (velocity);
 		setExecution (null);
 		init ();
+		suspended = false;
 	}
 	
 	public void setVelocity (int velocity)
@@ -122,5 +124,41 @@ public class Manager
 		}		
 			
 		return check;
+	}
+	
+	public void run ()
+	{
+		try 
+		{
+			synchronized (this) 
+			{
+				while (suspended) 
+				{
+					wait ();
+					getExecution ().suspendIt ();					
+				}
+			}
+		}
+		catch (InterruptedException e) 
+		{
+			e.printStackTrace ();
+		}
+	}
+	
+	public synchronized void resumeIt ()
+	{
+		suspended = false;
+		notify ();
+		getExecution ().resumeIt ();
+	}
+	
+	public boolean isSuspended ()
+	{
+		return suspended;
+	}
+	
+	public void suspendIt ()
+	{
+		suspended = true;
 	}
 }

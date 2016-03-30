@@ -13,18 +13,58 @@ import javax.swing.Timer;
 import controllers.Global;
 
 
-public class Activity/* extends Thread /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
+public class Activity extends Thread /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
 					                   de un archivo de texto a otro*/
 {
 	private String rootPath; //ruta del archivo que contiene los caracteres
 	private String destinationPath; //ruta del archivo destino en el cual se van a pegar los caracteres
-
+	private Global global;
+	private boolean suspended;
+	
 	public Activity (String rootPath, String destinationPath) 
 	{
 		setRootPath (rootPath);
 		setDestinationPath (destinationPath);
+		global = new Global ();
+		suspended = false;
 	}
 
+	public boolean isSuspended ()
+	{
+		return suspended;
+	}
+	
+	public void suspendIt ()
+	{
+		suspended = true;
+	}
+	
+	public synchronized void resumeIt ()
+	{
+		suspended = false;
+		notify ();
+	}
+	
+	public void run ()
+	{
+		try 
+		{
+			synchronized (this) 
+			{
+				while (suspended) 
+				{
+					wait ();
+				}
+			}
+		}
+		catch (InterruptedException e) 
+		{
+			e.printStackTrace ();
+		}
+	}
+	
+	
+	
 	public void setRootPath (String rootPath)
 	{
 		this.rootPath = rootPath;		
@@ -113,7 +153,7 @@ public class Activity/* extends Thread /*recibe el nombre ya que es una clase di
 		return text;
 	}
 	
-	public short copyAndPaste (int velocity, Process process, views.MainWindow mainWindow) throws IOException, InterruptedException
+	public void copyAndPaste (int velocity, Process process, views.MainWindow mainWindow) throws IOException, InterruptedException
 	{		
 		String text = readRootFile ();
 		File destinationFile = getDestinationFileIfExists ();
@@ -123,8 +163,6 @@ public class Activity/* extends Thread /*recibe el nombre ya que es una clase di
 		int time = 0;
 		float limit = process.getQuantum () * 1000;
 		float rafaga = 0;
-		short eventIdentifier = 0;
-		Global global = new Global ();
 		
 		if (text != null && destinationFile != null)
 		{
@@ -136,8 +174,7 @@ public class Activity/* extends Thread /*recibe el nombre ya que es una clase di
 			global.setLetters (text);
 			writer = new FileWriter (destinationFile);
 			global.setWriter (writer);
-			global.setI (0);
-			//String percentage = null;			
+			global.setI (0);			
 			
 			Timer timer = new Timer
 			(
@@ -148,7 +185,9 @@ public class Activity/* extends Thread /*recibe el nombre ya que es una clase di
 					{
 						// TODO Auto-generated method stub		
 						if (global.getI () < global.getSize ())
-						{
+						{	
+							//System.out.println ("Test");
+							
 							if (global.getTime () < limit)
 							{													
 								try 
@@ -168,40 +207,58 @@ public class Activity/* extends Thread /*recibe el nombre ya que es una clase di
 								mainWindow.getProgressBar ().repaint ();
 							}
 							else
-							{
-								global.setTime (0);
-								
-								try 
-								{
-									global.getWriter ().close ();
-								} 
-								catch (IOException e) 
-								{
-									// TODO Auto-generated catch block
-									e.printStackTrace ();
-								}
-								
-								process.stop ();
+							{								
+								process.suspendIt ();	
+								//global.setTime (0);
 							}
 							
 							global.setI (global.getI () + 1);
+						}
+						else
+						{
+							try 
+							{
+								global.getWriter ().close ();
+							} 
+							catch (IOException e) 
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							process.completed ();							
 						}
 					}								
 				}
 			);		
 			
+			
 			timer.start ();
+	
+			
+			/*while (true)
+			{
+				if (global.getTime () >= limit)
+				{
+					global.setTime (0);
+					timer.stop ();		
+					System.out.println ("entro");
+					break;
+				}
+			}*/
 			/*while (global.getI () < global.getSize ())
 			{
 				if (global.getTime () < limit)
-				{					
+				{
+					timer = new Timer (velocity, getActionListener (limit, mainWindow, velocity));			
+					timer.setRepeats (false);
 					timer.start ();
 				}
 				else
 				{	
-					timer.stop ();
-					global.setTime (0);
-					
+					System.out.println ("Test 4");
+					//timer.stop ();
+					/*
 					try 
 					{
 						global.getWriter ().close ();
@@ -210,11 +267,12 @@ public class Activity/* extends Thread /*recibe el nombre ya que es una clase di
 					{
 						// TODO Auto-generated catch block
 						e.printStackTrace ();
-					}
-					
-					process.stop ();
-				}							
-			}*/
+					}*/
+					/*
+					process.wait ();
+				}
+				
+			}
 			
 			/*for (int i = 0; i < size; i ++)
 			{
@@ -244,25 +302,6 @@ public class Activity/* extends Thread /*recibe el nombre ya que es una clase di
 			
 			writer.close ();*/
 		}
-		else 
-		{
-			if (text == null)
-			{
-				eventIdentifier = 1;
-			}
-			
-			if (destinationFile == null)
-			{
-				eventIdentifier = 2;
-			}
-			
-			if (text == null && destinationFile == null)
-			{
-				eventIdentifier = 3;
-			}
-		}
-		
-		return eventIdentifier;
 	}
 	
 	public long getNumberOfCharacters () throws IOException

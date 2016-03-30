@@ -57,19 +57,27 @@ public class MainWindow implements ActionListener
 				{
 					mainWindow.getToggleButton ().setText ("Detener");
 					
-					try 
+					if (!manager.isSuspended ())
 					{
-						startProcessing ();
-					} 
-					catch (IOException | InterruptedException exception) 
+						try 
+						{
+							processing ();
+						} 
+						catch (IOException | InterruptedException exception) 
+						{
+							// TODO Auto-generated catch block
+							exception.printStackTrace();
+						}
+					}	
+					else
 					{
-						// TODO Auto-generated catch block
-						exception.printStackTrace();
+						manager.resumeIt ();
 					}
 				}
 				else
 				{
-					mainWindow.getToggleButton ().setText ("Iniciar");
+					mainWindow.getToggleButton ().setText ("Iniciar");										
+					manager.suspendIt ();
 				}							
 					
 				break;
@@ -88,7 +96,16 @@ public class MainWindow implements ActionListener
 				mainWindow.getVelocityField ().setEnabled (true);
 				mainWindow.getVelocityField ().setText (null);
 				mainWindow.getPidLabel ().setText ("PID:");
-				mainWindow.getNameLabel ().setText ("Nombre:");
+				mainWindow.getNameLabel ().setText ("Nombre:");				
+				
+				if (manager.getExecution () != null)
+				{										
+					manager.getExecution ().getActivity ().suspendIt ();
+					manager.getExecution ().suspendIt ();
+					manager.suspendIt ();
+					manager = null;
+				}				
+				
 				mainWindow.getProgressLabel ().setText ("Progreso:");
 				mainWindow.getProgressBar ().setValue (0);
 				
@@ -106,7 +123,12 @@ public class MainWindow implements ActionListener
 				
 				if (!mainWindow.getVelocityField ().getText ().equals ("") && global.isNumeric (mainWindow.getVelocityField ().getText ()))
 				{
-					manager = new Manager (Integer.parseInt (mainWindow.getVelocityField ().getText ()));
+					if (manager == null)
+					{
+						manager = new Manager (Integer.parseInt (mainWindow.getVelocityField ().getText ()));					
+					}
+					
+					manager.start ();
 					mainWindow.getVelocityField ().setEnabled (false);
 					mainWindow.getCreateButton ().setEnabled (true);
 				}
@@ -154,38 +176,88 @@ public class MainWindow implements ActionListener
 		return model;
 	}
 	
-	private void startProcessing () throws IOException, InterruptedException
-	{
+	private void processing () throws IOException, InterruptedException
+	{	
+		boolean liberation = true;
 		models.Process process = null;
 		int velocity = manager.getVelocity ();
 		
 		while (true)
 		{
-			if (!manager.getReadyQueue ().isEmpty ())
-			{
-				process = manager.getReadyQueue ().poll ();
-				
+			if (!manager.getReadyQueue ().isEmpty () && liberation)
+			{				
 				if (manager.getExecution () == null)
 				{
+					process = manager.getReadyQueue ().poll ();
 					mainWindow.getPidLabel ().setText ("PID: " + String.valueOf (process.getPid ()));
 					mainWindow.getNameLabel ().setText ("Nombre: " + process.getName ());
 					manager.setExecution (process); //De listo a ejecución
-					manager.getExecution().start();
-					manager.getExecution ().run (velocity, mainWindow);
+					modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
+					manager.getExecution ().start ();
+					manager.getExecution ().executeActivity (velocity, mainWindow);
 					
-					if (manager.getExecution ().isInterrupted ())
+					
+					/*while (true)
 					{
-						JOptionPane.showMessageDialog (null, "interrumpido");
-					}
-					else
+						if (manager.getExecution ().isSuspended ())
+						{
+							modifyStateInTable (manager.getExecution ().getPid (), "Detenido");
+							manager.getStopQueue ().add (manager.getExecution ());
+							manager.setExecution (null);
+							liberation = true;
+							JOptionPane.showMessageDialog (null, "¡Suspendido!");
+							break;							
+						}
+					}*/
+					/*while (true)
 					{
-						JOptionPane.showMessageDialog (null, "NO interrumpido");
-					}
+						if (manager.getExecution ().isSuspended ())
+						{
+							modifyStateInTable (manager.getExecution ().getPid (), "Detenido");
+							manager.getStopQueue ().add (manager.getExecution ());
+							manager.setExecution (null);
+							liberation = true;
+							break;
+						}
+						else if (manager.getExecution ().isCompleted ())
+						{
+							modifyStateInTable (manager.getExecution ().getPid (), "Terminado");
+							manager.getListOfCompleted ().add (manager.getExecution ());
+							manager.setExecution (null);
+							liberation = false;
+							break;
+						}
+					}*/
 				}								
+			}
+			else if (!manager.getStopQueue ().isEmpty ())
+			{
+				/*if (manager.getExecution () == null)
+				{
+					process = manager.getStopQueue ().poll ();
+					mainWindow.getPidLabel ().setText ("PID: " + String.valueOf (process.getPid ()));
+					mainWindow.getNameLabel ().setText ("Nombre: " + process.getName ());
+					manager.setExecution (process); //De listo a ejecución
+					modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
+					manager.getExecution ().resumeIt ();
+				}*/ break;
 			}
 			else
 			{
 				break;
+			}
+		}
+	}
+	
+	private void modifyStateInTable (int pid, String state)
+	{
+		int size = mainWindow.getTable ().getRowCount ();
+		
+		for (int i = 0; i < size; i ++)
+		{
+			if (pid == (int) mainWindow.getTable ().getValueAt (i, 0))
+			{
+				mainWindow.getTable ().setValueAt (state, i, 4);
 			}
 		}
 	}

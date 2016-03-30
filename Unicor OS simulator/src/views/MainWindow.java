@@ -123,7 +123,7 @@ public class MainWindow extends JFrame
 	public JLabel getNameLabel () 
 	{
 		return nameLabel;
-	}
+	}	
 
 	public JLabel getProgressLabel () 
 	{
@@ -148,6 +148,11 @@ public class MainWindow extends JFrame
 	public JButton getAddVelocityButton () 
 	{
 		return addVelocityButton;
+	}
+	
+	public void setProgressBar (JProgressBar progressBar)
+	{
+		this.progressBar = progressBar;
 	}
 	
 	public JProgressBar getProgressBar ()
