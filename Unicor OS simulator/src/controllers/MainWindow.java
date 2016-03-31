@@ -16,7 +16,7 @@ public class MainWindow implements ActionListener
 	
 	public MainWindow ()
 	{
-		mainWindow = new views.MainWindow (getTableModel ());
+		mainWindow = new views.MainWindow (getTableModel ());		
 		manager = null;
 		initForm ();
 	}
@@ -46,7 +46,6 @@ public class MainWindow implements ActionListener
 	public void actionPerformed (ActionEvent event) 
 	{
 		Global global = null;
-		int size = 0;
 
 		// TODO Auto-generated method stub
 		switch (mainWindowComponents.valueOf (event.getActionCommand ()))
@@ -172,9 +171,7 @@ public class MainWindow implements ActionListener
 					mainWindow.getNameLabel ().setText ("Nombre: " + process.getName ());
 					manager.setExecution (process); //De listo a ejecución
 					modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
-					manager.getExecution ().start ();
-					
-					synchronized (manager){
+					manager.getExecution ().start ();		
 					manager.getExecution ().executeActivity (velocity, mainWindow, manager);														
 					
 					if (!manager.getExecution ().isSuspended () || !manager.getExecution ().isCompleted ())
@@ -216,7 +213,6 @@ public class MainWindow implements ActionListener
 							liberation = false;
 							break;
 						}*/
-					}
 				}	
 			}
 			else if (!manager.getStopQueue ().isEmpty ())

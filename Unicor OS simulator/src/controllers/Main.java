@@ -14,7 +14,7 @@ public class Main
 				{
 					try 
 					{
-						new MainWindow ();						
+						new MainWindow ();	
 					} 
 					catch (Exception e) 
 					{

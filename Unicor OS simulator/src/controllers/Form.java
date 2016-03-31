@@ -120,6 +120,7 @@ public class Form implements ActionListener, KeyListener
 				
 			case cancelButton:
 				
+				mainWindow.setEnabled (true);
 				form.dispose ();
 				break;
 		}

@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Activity /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
-					  de un archivo de texto a otro*/
+					    de un archivo de texto a otro*/
 {
 	private String rootPath; //ruta del archivo que contiene los caracteres
 	private String destinationPath; //ruta del archivo destino en el cual se van a pegar los caracteres
@@ -106,7 +106,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return text;
 	}
 	
-	public void copyAndPaste (int velocity, Process process, views.MainWindow mainWindow, Manager manager) throws IOException, 
+	public void copyAndPaste (int velocity, Process process, views.MainWindow mainWindow, Manager manager) throws IOException, 	
 	InterruptedException
 	{		
 		String text = readRootFile ();
@@ -135,11 +135,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 					{						
 						writer.append (letters [i]);
 						//chronometer.initChronometer ();
-						for (int j = 0; j < velocity; j ++)
-						{
-							Thread.sleep (1);							
-						}
-						
+						Thread.sleep (velocity);						
 					} 
 					catch (IOException e) 
 					{
@@ -148,10 +144,10 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 					}															
 					
 					time += velocity;
-					mainWindow.getProgressBar ().setValue ((int) ((i * velocity * 100) / rafaga));
+					mainWindow.getProgressBar ().setValue ((int) ((i * velocity * 100) / rafaga));					
 					percentage = new String (String.valueOf ((int) ((i * velocity * 100) / rafaga)));	
-					mainWindow.getProgressLabel ().setText ("Progreso: " + percentage + "%");
-					mainWindow.getProgressBar ().repaint ();
+					mainWindow.getProgressLabel ().setText ("Progreso: " + percentage + "%");					
+					mainWindow.getProgressBar ().repaint ();					
 				}
 				else
 				{						

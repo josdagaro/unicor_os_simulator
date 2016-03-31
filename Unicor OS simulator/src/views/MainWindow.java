@@ -16,7 +16,7 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 import java.awt.Font;
 
-public class MainWindow extends JFrame
+public class MainWindow extends JFrame 
 {
 	/**
 	 * 
@@ -33,12 +33,13 @@ public class MainWindow extends JFrame
 	private JButton createButton;
 	private JButton addVelocityButton;
 	private JProgressBar progressBar;
-
+	
 	/**
 	 * Create the frame.
 	 */
+	
 	public MainWindow (DefaultTableModel model) 
-	{
+	{		
 		setResizable (false);		
 		setTitle ("Unicor OS simulator");
 		setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
@@ -148,11 +149,6 @@ public class MainWindow extends JFrame
 	public JButton getAddVelocityButton () 
 	{
 		return addVelocityButton;
-	}
-	
-	public void setProgressBar (JProgressBar progressBar)
-	{
-		this.progressBar = progressBar;
 	}
 	
 	public JProgressBar getProgressBar ()
