@@ -1,27 +1,21 @@
 package controllers;
 
-import java.awt.EventQueue;
+import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
 public class Main 
 {
 	public static void main (String [] args)
 	{
-		EventQueue.invokeLater 
+		SwingUtilities.invokeLater
 		(
-			new Runnable () 
+			new Runnable ()
 			{
-				public void run() 
-				{
-					try 
-					{
-						new MainWindow ();	
-					} 
-					catch (Exception e) 
-					{
-						e.printStackTrace ();
-					}
+				public void run ()
+				{					
+					new MainWindow ();
 				}
 			}
-		);
+		);		
 	}
 }

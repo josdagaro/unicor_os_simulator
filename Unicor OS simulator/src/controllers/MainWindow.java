@@ -5,8 +5,10 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
+import models.Global;
 import models.Manager;
 
 public class MainWindow implements ActionListener
@@ -16,7 +18,7 @@ public class MainWindow implements ActionListener
 	
 	public MainWindow ()
 	{
-		mainWindow = new views.MainWindow (getTableModel ());		
+		this.mainWindow = new views.MainWindow (getTableModel ());
 		manager = null;
 		initForm ();
 	}
@@ -31,15 +33,16 @@ public class MainWindow implements ActionListener
 		mainWindow.setLocationRelativeTo (null);
 		mainWindow.setVisible (true);
 		mainWindow.getToggleButton ().setEnabled (false);
-		mainWindow.getToggleButton ().setActionCommand ("toggleButton");
-		mainWindow.getToggleButton ().addActionListener (this);
-		mainWindow.getRebootButton ().setActionCommand ("rebootButton");
-		mainWindow.getRebootButton ().addActionListener (this);
 		mainWindow.getCreateButton ().setEnabled (false);
+		mainWindow.getToggleButton ().setActionCommand ("toggleButton");
+		mainWindow.getRebootButton ().setActionCommand ("rebootButton");
 		mainWindow.getCreateButton ().setActionCommand ("createButton");
-		mainWindow.getCreateButton ().addActionListener (this);
 		mainWindow.getAddVelocityButton ().setActionCommand ("addVelocityButton");
+		mainWindow.getToggleButton ().addActionListener (this);
+		mainWindow.getRebootButton ().addActionListener (this);
+		mainWindow.getCreateButton ().addActionListener (this);
 		mainWindow.getAddVelocityButton ().addActionListener (this);		
+		
 	}
 
 	@Override
@@ -51,32 +54,48 @@ public class MainWindow implements ActionListener
 		switch (mainWindowComponents.valueOf (event.getActionCommand ()))
 		{
 			case toggleButton:
-				
+								
 				if (mainWindow.getToggleButton ().getText ().equals ("Iniciar"))
-				{
-					mainWindow.getToggleButton ().setText ("Detener");
-					
+				{																
 					if (!manager.isSuspended ())
 					{
-						try 
-						{
-							processing ();
-						} 
-						catch (IOException | InterruptedException exception) 
-						{
-							// TODO Auto-generated catch block
-							exception.printStackTrace();
-						}
+						mainWindow.getToggleButton ().setText ("Detener");
+						
+						final SwingWorker <?, ?> worker = new SwingWorker <Object, Object> () 
+						{								
+							@Override
+							protected Object doInBackground () throws Exception 
+							{
+								processesRun ();
+								return null;
+							}
+						};
+						
+						worker.execute ();
 					}	
 					else
-					{
+					{						
 						manager.resumeIt ();
 					}
+					
+					if (manager.isCompleted ())
+					{
+						JOptionPane.showMessageDialog (null, "Todo el procesamiento ha finalizado, no hay nada que iniciar");
+					}
 				}
-				else
-				{
-					mainWindow.getToggleButton ().setText ("Iniciar");										
-					manager.suspendIt ();
+				else if (manager.isRunning ())
+				{	
+					mainWindow.getToggleButton ().setText ("Iniciar");	
+					
+					try 
+					{						
+						manager.suspendIt ();
+					} 
+					catch (InterruptedException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}							
 					
 				break;
@@ -106,7 +125,6 @@ public class MainWindow implements ActionListener
 						manager = new Manager (Integer.parseInt (mainWindow.getVelocityField ().getText ()));					
 					}
 					
-					manager.start ();
 					mainWindow.getVelocityField ().setEnabled (false);
 					mainWindow.getCreateButton ().setEnabled (true);
 				}
@@ -154,83 +172,71 @@ public class MainWindow implements ActionListener
 		return model;
 	}
 	
-	private void processing () throws IOException, InterruptedException
+	private void processesRun () throws IOException, InterruptedException
 	{	
-		boolean liberation = true;
-		models.Process process = null;
-		int velocity = manager.getVelocity ();
+		System.out.println ("Despachador inicia");	
+		manager.start ();
 		
-		while (true)
-		{
-			if (!manager.getReadyQueue ().isEmpty () && liberation)
+		while (!manager.isCompleted ())
+		{										
+			synchronized (manager)
+			{
+				System.out.println ("1) Se detiene el controlador de la ventana principal");
+				manager.suspendIt ();
+				System.out.println ("Se actualiza estado del proceso en la tabla");
+				mainWindow.getPidLabel ().setText ("PID: " + String.valueOf (manager.getExecution ().getPid ()));
+				mainWindow.getNameLabel ().setText ("Nombre: " + manager.getExecution ().getName ());	
+				modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");				
+			}			
+			
+			while (true)
 			{				
-				if (manager.getExecution () == null)
+				if (manager.isSuspended ())
 				{
-					process = manager.getReadyQueue ().poll ();
-					mainWindow.getPidLabel ().setText ("PID: " + String.valueOf (process.getPid ()));
-					mainWindow.getNameLabel ().setText ("Nombre: " + process.getName ());
-					manager.setExecution (process); //De listo a ejecución
-					modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
-					manager.getExecution ().start ();		
-					manager.getExecution ().executeActivity (velocity, mainWindow, manager);														
-					
-					if (!manager.getExecution ().isSuspended () || !manager.getExecution ().isCompleted ())
+					if (!manager.getExecution ().getActivity ().getTask ().isSuspended ())
 					{
-						System.out.println ("¡No suspendido!");
+						System.out.println ("Se inicia nueva tarea");	
+						
+						manager.getExecution ().executeActivity 
+						(
+							manager.getVelocity (), mainWindow.getProgressBar (), mainWindow.getProgressLabel ()
+						);
 					}
 					else
 					{
-						System.out.println ("¡Suspendido!");
+						System.out.println ("Se resume tarea");
+						System.out.println ("Se actualiza estado del proceso en la tabla");
+						manager.getExecution ().getActivity ().getTask ().resumeIt ();						
+						modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
 					}
-					/*INTENTAR PASANDO MANAGER POR PARAMETRO PARA PASA A COLA DETENIDO ALLA EN ACTIVITY*/
-					/*while (true)
+					
+					System.out.println ("4) Se reanuda el despachador");
+					manager.resumeIt ();
+					
+					while (true)
 					{
-						if (manager.getExecution ().isSuspended ())
+						if (manager.isSuspended ())
 						{
-							modifyStateInTable (manager.getExecution ().getPid (), "Detenido");
-							manager.getStopQueue ().add (manager.getExecution ());
-							manager.setExecution (null);
-							liberation = true;
-							JOptionPane.showMessageDialog (null, "¡Suspendido!");
-							break;							
-						}
-					}*/
-					/*while (true)
-					{
-						if (manager.getExecution ().isSuspended ())
-						{
-							modifyStateInTable (manager.getExecution ().getPid (), "Detenido");
-							manager.getStopQueue ().add (manager.getExecution ());
-							manager.setExecution (null);
-							liberation = true;
+							System.out.println ("Se actualiza estado del proceso en la tabla");
+							
+							if (manager.getExecution ().getActivity ().getTask ().isSuspended ())
+							{																
+								modifyStateInTable (manager.getExecution ().getPid (), "Detenido");
+							}
+							else if (manager.getExecution ().getActivity ().getTask ().isCompleted ())
+							{						
+								modifyStateInTable (manager.getExecution ().getPid (), "Terminado");
+							}							
+							
+							System.out.println ("6) Se reanuda el despachador");
+							manager.resumeIt ();
 							break;
 						}
-						else if (manager.getExecution ().isCompleted ())
-						{
-							modifyStateInTable (manager.getExecution ().getPid (), "Terminado");
-							manager.getListOfCompleted ().add (manager.getExecution ());
-							manager.setExecution (null);
-							liberation = false;
-							break;
-						}*/
-				}	
-			}
-			else if (!manager.getStopQueue ().isEmpty ())
-			{
-				/*if (manager.getExecution () == null)
-				{
-					process = manager.getStopQueue ().poll ();
-					mainWindow.getPidLabel ().setText ("PID: " + String.valueOf (process.getPid ()));
-					mainWindow.getNameLabel ().setText ("Nombre: " + process.getName ());
-					manager.setExecution (process); //De listo a ejecución
-					modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
-					manager.getExecution ().resumeIt ();
-				}*/ break;
-			}
-			else
-			{
-				break;
-			}
+					}
+					
+					break;
+				}
+			}			
 		}
 	}
 	

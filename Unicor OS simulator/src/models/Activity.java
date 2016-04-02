@@ -6,16 +6,21 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+
 public class Activity /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
 					    de un archivo de texto a otro*/
 {
 	private String rootPath; //ruta del archivo que contiene los caracteres
 	private String destinationPath; //ruta del archivo destino en el cual se van a pegar los caracteres
+	private Task task; //Hilo que realizará el copiado y pegado
 	
 	public Activity (String rootPath, String destinationPath) 
 	{
 		setRootPath (rootPath);
 		setDestinationPath (destinationPath);
+		task = new Task ();
 	}
 	
 	public void setRootPath (String rootPath)
@@ -36,6 +41,11 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 	public String getDestinationPath ()
 	{
 		return destinationPath;
+	}
+	
+	public Task getTask ()
+	{
+		return task;
 	}
 	
 	private File getRootFileIfExists ()
@@ -72,7 +82,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return destinationFile;
 	}
 	
-	public String readRootFile () throws IOException
+	private String readRootFile () throws IOException
 	{
 		File rootFile = getRootFileIfExists ();
 		FileReader reader = null;
@@ -106,136 +116,25 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return text;
 	}
 	
-	public void copyAndPaste (int velocity, Process process, views.MainWindow mainWindow, Manager manager) throws IOException, 	
+	public void copyAndPaste (String name, int velocity, float quantum, JProgressBar progressBar, JLabel progressLabel) throws IOException, 	
 	InterruptedException
-	{		
+	{				
 		String text = readRootFile ();
 		File destinationFile = getDestinationFileIfExists ();
 		FileWriter writer = null;
 		long size = 0;
-		char [] letters = null;
-		int time = 0;
-		float limit = process.getQuantum () * 1000;
+		char [] letters = null;		
+		float limit = quantum * 1000;
 		float rafaga = 0;
-		String percentage = null;
-		
+				
 		if (text != null && destinationFile != null)
 		{
 			size = text.length ();
 			rafaga = size * velocity;
 			letters = text.toCharArray ();
 			writer = new FileWriter (destinationFile);
-					
-			for (int i = 0; i < size; i ++)
-			{	
-				//System.out.println ("Test");							
-				if (time < limit)
-				{													
-					try 
-					{						
-						writer.append (letters [i]);
-						//chronometer.initChronometer ();
-						Thread.sleep (velocity);						
-					} 
-					catch (IOException e) 
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}															
-					
-					time += velocity;
-					mainWindow.getProgressBar ().setValue ((int) ((i * velocity * 100) / rafaga));					
-					percentage = new String (String.valueOf ((int) ((i * velocity * 100) / rafaga)));	
-					mainWindow.getProgressLabel ().setText ("Progreso: " + percentage + "%");					
-					mainWindow.getProgressBar ().repaint ();					
-				}
-				else
-				{						
-					//manager.getStopQueue ().add (process);
-					//manager.setExecution (null);
-					process.suspendIt ();					
-					//global.setTime (0);
-				}										
-			}
-			
-			try 
-			{
-				writer.close ();
-			} 
-			catch (IOException e) 
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-							
-			process.completed ();																					
-
-			
-			/*while (true)
-			{
-				if (global.getTime () >= limit)
-				{
-					global.setTime (0);
-					timer.stop ();		
-					System.out.println ("entro");
-					break;
-				}
-			}*/
-			/*while (global.getI () < global.getSize ())
-			{
-				if (global.getTime () < limit)
-				{
-					timer = new Timer (velocity, getActionListener (limit, mainWindow, velocity));			
-					timer.setRepeats (false);
-					timer.start ();
-				}
-				else
-				{	
-					System.out.println ("Test 4");
-					//timer.stop ();
-					/*
-					try 
-					{
-						global.getWriter ().close ();
-					} 
-					catch (IOException e) 
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace ();
-					}*/
-					/*
-					process.wait ();
-				}
-				
-			}
-			
-			/*for (int i = 0; i < size; i ++)
-			{
-				if (time < limit) //limit es el quantum expresado en milisegundos
-				{
-					writer.append (letters [i]);
-					timer.start ();
-					//se espera el tiempo indicado entre copiado de caracter
-					time += velocity;
-					mainWindow.getProgressBar ().setValue ((int) ((i * velocity * 100) / rafaga)); //se actualiza la barra de progreso
-					percentage = String.valueOf ((int) ((i * velocity * 100) / rafaga));				
-					mainWindow.getProgressLabel ().setText ("Progreso: " + percentage + "%"); //se actualiza el label de progreso
-					mainWindow.getProgressBar ().repaint ();				
-				}
-				else //si time llega a ser igual al quantum, entonces se reinicia time a cero y se detiene el proceso de copiado con la funcion wait
-				{	//JOptionPane.showMessageDialog (null, "aqui");
-					time = 0;
-					writer.close ();
-					
-					synchronized (this)
-					{
-						this.wait ();
-					}
-					//el objeto de tipo Activity va a esperar que la funcion notify se llame para reanudar su proceso					
-				}				
-			}
-			
-			writer.close ();*/
+			task.init (name, size, writer, limit, letters, progressBar, progressLabel, rafaga, velocity);
+			task.start ();
 		}
 	}
 	

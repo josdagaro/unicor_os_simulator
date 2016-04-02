@@ -10,14 +10,18 @@ public class Manager extends Thread
 	private Queue <Process> stopQueue; //cola de procesos detenidos
 	private LinkedList <Process> listOfCompleted; //lista de procesos terminados
 	private Process execution;
+	private boolean running;
 	private boolean suspended;
+	private boolean completed;
 	
 	public Manager (int velocity)
 	{
 		setVelocity (velocity);
 		setExecution (null);
 		init ();
+		running = false;
 		suspended = false;
+		completed = false;
 	}
 	
 	public void setVelocity (int velocity)
@@ -128,28 +132,82 @@ public class Manager extends Thread
 	
 	public void run ()
 	{
-		try 
+		boolean liberation = false;
+		running = true;
+						
+		while (!getReadyQueue ().isEmpty () || !getStopQueue ().isEmpty ())
 		{
-			synchronized (this) 
+			if (!liberation && !getReadyQueue ().isEmpty ())
 			{
-				while (suspended) 
+				setExecution (getReadyQueue ().poll ());												
+			}
+			else if (!getStopQueue ().isEmpty ())
+			{
+				setExecution (getStopQueue ().poll ());
+			}
+			
+			while (true)
+			{
+				if (isSuspended ())
 				{
-					wait ();
-					getExecution ().suspendIt ();					
+					System.out.println ("2) Se reanuda el controlador de la ventana principal");
+					resumeIt ();					
+					break;
 				}
 			}
-		}
-		catch (InterruptedException e) 
-		{
-			e.printStackTrace ();
-		}
+			
+			try 
+			{
+				System.out.println ("3) Se detiene el despachador");
+				suspendIt ();
+				
+				System.out.println ("Esperando suspensión o finalización");
+				
+				while (true)
+				{
+					if 
+					(
+						getExecution ().getActivity ().getTask ().isSuspended () || 
+						getExecution ().getActivity ().getTask ().isCompleted ()
+					)
+					{
+						break;
+					}					
+				}
+				
+				if (getExecution ().getActivity ().getTask ().isSuspended ())
+				{
+					getStopQueue ().add (getExecution ());							
+				}
+				else if (getExecution ().getActivity ().getTask ().isCompleted ())
+				{
+					System.out.println ("Tarea terminada");
+					getListOfCompleted ().add (getExecution ());						
+					liberation = true;					
+				}							
+					
+				System.out.println ("5) Se detiene el despachador");
+				suspendIt ();
+				setExecution (null);												
+			} 
+			catch (InterruptedException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}											
+		}		
+		
+		completed = true;
 	}
 	
 	public synchronized void resumeIt ()
 	{
 		suspended = false;
-		notify ();
-		getExecution ().resumeIt ();
+		
+		synchronized (this)
+		{
+			notify ();
+		}
 	}
 	
 	public boolean isSuspended ()
@@ -157,8 +215,23 @@ public class Manager extends Thread
 		return suspended;
 	}
 	
-	public void suspendIt ()
+	public void suspendIt () throws InterruptedException
 	{
 		suspended = true;
+		
+		synchronized (this)
+		{
+			wait ();
+		}
+	}
+	
+	public boolean isCompleted ()
+	{
+		return completed;
+	}
+	
+	public boolean isRunning ()
+	{
+		return running;
 	}
 }

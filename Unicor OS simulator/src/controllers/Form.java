@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import models.Activity;
 import models.FileSelector;
+import models.Global;
 import models.Manager;
 import models.Process;
 

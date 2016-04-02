@@ -2,14 +2,16 @@ package models;
 
 import java.io.IOException;
 
-public class Process extends Thread 
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+
+public class Process
 {
 	private int pid; //identificación del proceso	
+	private String name;
 	private float quantum; //tiempo en segundos en uso CPU
 	private Activity activity; /*actividad del proceso, contiene ruta fuente (copiado) y destino (pegado)
 	 							 como también las funciones necesarias para realizar dicha tarea*/
-	private boolean suspended;
-	private boolean completed;
 
 	public Process (int pid, String name, float quantum, Activity activity)
 	{
@@ -18,8 +20,6 @@ public class Process extends Thread
 		setName (name); //metodos setName () y getName () heredados de la clase Thread
 		setQuantum (quantum);
 		setActivity (activity);
-		suspended = false;
-		completed = false;
 	}
 
 	public void setPid (int pid)
@@ -27,6 +27,11 @@ public class Process extends Thread
 		this.pid = pid;
 	}	
 
+	public void setName (String name)
+	{
+		this.name = name;
+	}
+	
 	public void setQuantum (float quantum)
 	{
 		this.quantum = quantum;
@@ -42,6 +47,11 @@ public class Process extends Thread
 		return pid;
 	}	
 
+	public String getName ()
+	{
+		return name;
+	}
+	
 	public float getQuantum ()
 	{
 		return quantum;
@@ -52,9 +62,10 @@ public class Process extends Thread
 		return activity;
 	}
 
-	public void executeActivity (int velocity, views.MainWindow mainWindow, Manager manager) throws IOException, InterruptedException
+	public void executeActivity (int velocity, JProgressBar progressBar, JLabel progressLabel) throws IOException, 
+	InterruptedException
 	{
-		getActivity ().copyAndPaste (velocity, this, mainWindow, manager);		
+		getActivity ().copyAndPaste (getName (), velocity, getQuantum (), progressBar, progressLabel);		
 	}
 
 	public float getRafagaTime (int velocity) throws IOException
@@ -62,49 +73,5 @@ public class Process extends Thread
 		float rafagaTime = 0;
 		rafagaTime = velocity * getActivity ().getNumberOfCharacters ();
 		return rafagaTime;
-	}
-	
-	public void suspendIt ()
-	{
-		suspended = true;
-	}
-
-	public void run ()
-	{
-		try 
-		{
-			synchronized (this) 
-			{
-				while (suspended) 
-				{
-					wait ();
-				}
-			}
-		}
-		catch (InterruptedException e) 
-		{
-			e.printStackTrace ();
-		}
-	}
-	
-	public synchronized void resumeIt ()
-	{
-		suspended = false;
-		notify ();
-	}
-	
-	public boolean isSuspended ()
-	{
-		return suspended;
-	}
-	
-	public boolean isCompleted ()
-	{
-		return completed;
-	}
-	
-	public void completed ()
-	{
-		completed = true;
 	}
 }
