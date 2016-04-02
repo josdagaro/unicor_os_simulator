@@ -18,6 +18,10 @@ import java.awt.Font;
 
 public class MainWindow extends JFrame 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTable table;
 	private JTextField velocityField;

@@ -18,12 +18,14 @@ public class Task extends Thread
 	private JLabel progressLabel;
 	private float rafaga;
 	private int velocity;
+	private boolean stopped;
 	
 	public Task ()
 	{
 		super ();
 		suspended = false;
 		completed = false;
+		stopped = false;
 	}
 	
 	public void init (String name, long size, FileWriter writer, float limit, char [] letters, JProgressBar progressBar, JLabel progressLabel, float rafaga, int velocity)
@@ -49,6 +51,26 @@ public class Task extends Thread
 		return completed;
 	}
 	
+	public void stopTrue ()
+	{
+		stopped = true;
+	}
+	
+	public void stopIt () throws InterruptedException
+	{
+		stopped = true;
+		
+		synchronized (this)
+		{
+			wait ();
+		}
+	}
+	
+	public boolean isStopped ()
+	{
+		return stopped;
+	}
+	
 	public void suspendIt () throws InterruptedException
 	{
 		suspended = true;
@@ -62,6 +84,7 @@ public class Task extends Thread
 	public void resumeIt ()
 	{
 		suspended = false;
+		stopped = false;
 		
 		synchronized (this)
 		{
@@ -70,7 +93,7 @@ public class Task extends Thread
 	}
 	
 	public void run ()
-	{
+	{		
 		String percentage = null;
 		int time = 0;
 		System.out.println ("Inicia la actividad");
@@ -78,28 +101,44 @@ public class Task extends Thread
 		for (int i = 0; i < size; i ++)
 		{
 			if (time < limit)
-			{													
-				try 
-				{						
-					writer.append (letters [i]);
-					Thread.sleep (velocity);						
-				} 
-				catch (IOException e)
+			{	
+				if (!stopped)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} 
-				catch (InterruptedException e) 
+					try 
+					{						
+						writer.append (letters [i]);
+						Thread.sleep (velocity);						
+					} 
+					catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+					catch (InterruptedException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}						
+					
+					time += velocity;
+					progressBar.setValue ((int) ((i * velocity * 100) / rafaga));					
+					percentage = new String (String.valueOf ((int) ((i * velocity * 100) / rafaga)));	
+					progressLabel.setText ("Progreso: " + percentage + "%");					
+					progressBar.repaint ();
+				}
+				else
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}										
-				
-				time += velocity;
-				progressBar.setValue ((int) ((i * velocity * 100) / rafaga));					
-				percentage = new String (String.valueOf ((int) ((i * velocity * 100) / rafaga)));	
-				progressLabel.setText ("Progreso: " + percentage + "%");					
-				progressBar.repaint ();
+					try 
+					{
+						System.out.println ("Proceso detenido con metodo stopIt");
+						stopIt ();
+					} 
+					catch (InterruptedException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 			else
 			{						

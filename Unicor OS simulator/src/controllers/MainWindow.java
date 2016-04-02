@@ -57,8 +57,8 @@ public class MainWindow implements ActionListener
 								
 				if (mainWindow.getToggleButton ().getText ().equals ("Iniciar"))
 				{																
-					if (!manager.isSuspended ())
-					{
+					if (!manager.isSuspended () && manager.getExecution () == null)
+					{					
 						mainWindow.getToggleButton ().setText ("Detener");
 						
 						final SwingWorker <?, ?> worker = new SwingWorker <Object, Object> () 
@@ -74,8 +74,11 @@ public class MainWindow implements ActionListener
 						worker.execute ();
 					}	
 					else
-					{						
+					{		
+						System.out.println ("Se reanuda el manager");
+						mainWindow.getToggleButton ().setText ("Detener");
 						manager.resumeIt ();
+						modifyStateInTable (manager.getExecution ().getPid (), "Ejecución");
 					}
 					
 					if (manager.isCompleted ())
@@ -87,15 +90,19 @@ public class MainWindow implements ActionListener
 				{	
 					mainWindow.getToggleButton ().setText ("Iniciar");	
 					
-					try 
-					{						
-						manager.suspendIt ();
-					} 
-					catch (InterruptedException e) 
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					final SwingWorker <?, ?> worker = new SwingWorker <Object, Object> () 
+					{								
+						@Override
+						protected Object doInBackground () throws Exception 
+						{
+							System.out.println ("Se activa stopTrue para la tarea");
+							manager.getExecution ().getActivity ().getTask ().stopTrue ();	
+							modifyStateInTable (manager.getExecution ().getPid (), "Detenido");
+							return null;
+						}
+					};
+					
+					worker.execute ();						
 				}							
 					
 				break;
@@ -220,11 +227,13 @@ public class MainWindow implements ActionListener
 							System.out.println ("Se actualiza estado del proceso en la tabla");
 							
 							if (manager.getExecution ().getActivity ().getTask ().isSuspended ())
-							{																
+							{			
+								System.out.println ("Detenido");
 								modifyStateInTable (manager.getExecution ().getPid (), "Detenido");
 							}
 							else if (manager.getExecution ().getActivity ().getTask ().isCompleted ())
 							{						
+								System.out.println ("Terminado");
 								modifyStateInTable (manager.getExecution ().getPid (), "Terminado");
 							}							
 							
@@ -232,6 +241,8 @@ public class MainWindow implements ActionListener
 							manager.resumeIt ();
 							break;
 						}
+						
+						Thread.sleep (1);
 					}
 					
 					break;

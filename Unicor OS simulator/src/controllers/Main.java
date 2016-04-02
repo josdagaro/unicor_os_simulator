@@ -1,7 +1,6 @@
 package controllers;
 
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
 
 public class Main 
 {

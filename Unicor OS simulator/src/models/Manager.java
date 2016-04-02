@@ -13,6 +13,7 @@ public class Manager extends Thread
 	private boolean running;
 	private boolean suspended;
 	private boolean completed;
+	private boolean stopped;
 	
 	public Manager (int velocity)
 	{
@@ -22,6 +23,7 @@ public class Manager extends Thread
 		running = false;
 		suspended = false;
 		completed = false;
+		stopped = false;
 	}
 	
 	public void setVelocity (int velocity)
@@ -164,13 +166,23 @@ public class Manager extends Thread
 				System.out.println ("Esperando suspensión o finalización");
 				
 				while (true)
-				{
-					if 
+				{	
+					Thread.sleep (1);
+					
+					if (getExecution ().getActivity ().getTask ().isStopped ())
+					{
+						System.out.println ("Por ende el proceso manager se detiene con stopIt");
+						stopIt ();
+						System.out.println ("Se reactiva el proceso manager");
+						System.out.println ("Por ende el proceso de copiado");
+						getExecution ().getActivity ().getTask ().resumeIt ();
+					}					
+					else if 
 					(
 						getExecution ().getActivity ().getTask ().isSuspended () || 
 						getExecution ().getActivity ().getTask ().isCompleted ()
 					)
-					{
+					{						
 						break;
 					}					
 				}
@@ -203,6 +215,7 @@ public class Manager extends Thread
 	public synchronized void resumeIt ()
 	{
 		suspended = false;
+		stopped = false;
 		
 		synchronized (this)
 		{
@@ -215,9 +228,29 @@ public class Manager extends Thread
 		return suspended;
 	}
 	
+	public boolean isStopped ()
+	{
+		return stopped;
+	}
+	
+	public void stopTrue ()
+	{
+		stopped = true;
+	}
+	
 	public void suspendIt () throws InterruptedException
 	{
 		suspended = true;
+		
+		synchronized (this)
+		{
+			wait ();
+		}
+	}
+	
+	public void stopIt () throws InterruptedException
+	{
+		stopped = true;
 		
 		synchronized (this)
 		{
