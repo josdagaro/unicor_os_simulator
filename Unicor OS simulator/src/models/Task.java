@@ -128,6 +128,8 @@ public class Task extends Thread
 				}
 				else
 				{
+					i --;
+					
 					try 
 					{
 						System.out.println ("Proceso detenido con metodo stopIt");
@@ -141,7 +143,9 @@ public class Task extends Thread
 				}
 			}
 			else
-			{						
+			{		
+				i --;
+				
 				try 
 				{
 					System.out.println ("Proceso [" + getName () + "]: detenido");					

@@ -146,6 +146,7 @@ public class Manager extends Thread
 			else if (!getStopQueue ().isEmpty ())
 			{
 				setExecution (getStopQueue ().poll ());
+				liberation = false;				
 			}
 			
 			while (true)
@@ -161,8 +162,7 @@ public class Manager extends Thread
 			try 
 			{
 				System.out.println ("3) Se detiene el despachador");
-				suspendIt ();
-				
+				suspendIt ();				
 				System.out.println ("Esperando suspensión o finalización");
 				
 				while (true)
@@ -189,13 +189,14 @@ public class Manager extends Thread
 				
 				if (getExecution ().getActivity ().getTask ().isSuspended ())
 				{
+					System.out.println ("Proceso almacenado en cola de detenidos");
 					getStopQueue ().add (getExecution ());							
 				}
 				else if (getExecution ().getActivity ().getTask ().isCompleted ())
 				{
 					System.out.println ("Tarea terminada");
 					getListOfCompleted ().add (getExecution ());						
-					liberation = true;					
+					liberation = true;	
 				}							
 					
 				System.out.println ("5) Se detiene el despachador");
@@ -209,6 +210,7 @@ public class Manager extends Thread
 			}											
 		}		
 		
+		running = false;
 		completed = true;
 	}
 	
