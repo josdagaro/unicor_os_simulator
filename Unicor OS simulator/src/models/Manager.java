@@ -3,6 +3,10 @@ package models;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement (name = "Manager")
+
 public class Manager extends Thread
 {
 	private int velocity; //tiempo de espera para cada thread en milisegundos para copiar cada caracter
@@ -40,7 +44,7 @@ public class Manager extends Thread
 	{
 		return velocity;
 	}
-	
+
 	public Queue <Process> getReadyQueue ()
 	{
 		return readyQueue;
@@ -136,6 +140,7 @@ public class Manager extends Thread
 	{
 		boolean liberation = false;
 		running = true;
+		int arrivalTime = 0;
 						
 		while (!getReadyQueue ().isEmpty () || !getStopQueue ().isEmpty ())
 		{
@@ -147,7 +152,15 @@ public class Manager extends Thread
 			{
 				setExecution (getStopQueue ().poll ());
 				liberation = false;				
+			}		
+			
+			if (!getExecution ().alreadyItCame ())
+			{
+				getExecution ().setArrivalTime (arrivalTime);
+				getExecution ().itCame ();
 			}
+			
+			getExecution ().setExecutions (getExecution ().getExecutions () + 1);
 			
 			while (true)
 			{
@@ -199,19 +212,25 @@ public class Manager extends Thread
 					liberation = true;	
 				}							
 					
-				System.out.println ("5) Se detiene el despachador");
+				if (getReadyQueue ().isEmpty () && getStopQueue ().isEmpty ())
+				{
+					completed = true;
+				}
+				
+				System.out.println ("5) Se detiene el despachador");				
 				suspendIt ();
-				setExecution (null);												
+				arrivalTime ++;
+				setExecution (null);
 			} 
 			catch (InterruptedException e) 
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}											
-		}		
+		}	
 		
+		System.out.println ("Fin del manager.");
 		running = false;
-		completed = true;
 	}
 	
 	public synchronized void resumeIt ()

@@ -6,9 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
-
 public class Activity /*recibe el nombre ya que es una clase diseñada solo para copiar y pegar caracteres 
 					    de un archivo de texto a otro*/
 {
@@ -116,7 +113,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return text;
 	}
 	
-	public void copyAndPaste (String name, int velocity, float quantum, JProgressBar progressBar, JLabel progressLabel) throws IOException, 	
+	public void copyAndPaste (String name, int velocity, float quantum, views.MainWindow mainWindow) throws IOException, 	
 	InterruptedException
 	{				
 		String text = readRootFile ();
@@ -133,7 +130,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 			rafaga = size * velocity;
 			letters = text.toCharArray ();
 			writer = new FileWriter (destinationFile);
-			task.init (name, size, writer, limit, letters, progressBar, progressLabel, rafaga, velocity);
+			task.init (name, size, writer, limit, letters, mainWindow, rafaga, velocity);
 			task.start ();
 		}
 	}

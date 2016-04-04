@@ -10,11 +10,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import models.Activity;
 import models.FileSelector;
-import models.Global;
 import models.Manager;
 import models.Process;
 
 import javax.swing.table.DefaultTableModel;
+
+import libraries.Global;
 
 public class Form implements ActionListener, KeyListener
 {
@@ -97,10 +98,10 @@ public class Form implements ActionListener, KeyListener
 						object = new Object [] 
 						{
 							process.getPid (), process.getName (), process.getRafagaTime (manager.getVelocity ()) / 1000,
-							process.getQuantum (), "Listo", 0
+							process.getQuantum (), "Listo", 0, process.getTotalExecutions (manager.getVelocity ())
 						};
 						
-						((DefaultTableModel) mainWindow.getTable ().getModel ()).addRow (object);
+						((DefaultTableModel) mainWindow.getTable ().getModel ()).addRow (object);						
 					} 
 					catch (IOException exception)
 					{
@@ -127,7 +128,7 @@ public class Form implements ActionListener, KeyListener
 		}
 	}	
 	
-	public void chooseFile (JTextField textField) //se ejecuta una ventana para seleccionar un archivo
+	private void chooseFile (JTextField textField) //se ejecuta una ventana para seleccionar un archivo
 	{
 		FileSelector fileSelector = new FileSelector ();
 		String path = fileSelector.getFilePath ();
@@ -135,6 +136,7 @@ public class Form implements ActionListener, KeyListener
 		if (path != null && !path.equals (""))
 		{
 			textField.setText (path);
+			
 			if (validateFields ())
 			{
 				form.getSaveButton ().setEnabled (true);

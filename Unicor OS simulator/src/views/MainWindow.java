@@ -33,6 +33,15 @@ public class MainWindow extends JFrame
 	private JButton createButton;
 	private JButton addVelocityButton;
 	private JProgressBar progressBar;
+	private JLabel executionsLabel;
+	private JPanel panel_8;
+	private JPanel panel_9;
+	private JPanel panel_10;
+	private JButton importButton;
+	private JPanel panel_11;
+	private JTextField xmlField;
+	private JPanel panel_12;
+	private JLabel lblNewLabel;
 	
 	/**
 	 * Create the frame.
@@ -43,14 +52,14 @@ public class MainWindow extends JFrame
 		setResizable (false);		
 		setTitle ("Unicor OS simulator");
 		setDefaultCloseOperation (JFrame.EXIT_ON_CLOSE);
-		setBounds (100, 100, 653, 440);
+		setBounds (100, 100, 766, 482);
 		contentPane = new JPanel ();
-		contentPane.setBorder(new TitledBorder (null, "Tabla de procesos", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPane.setBorder (new TitledBorder (null, "Tabla de procesos", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setContentPane (contentPane);
 		contentPane.setLayout (new GridLayout (3, 0, 0, 10));		
 		table = new JTable ();				
-		table.setFont(new Font("Dialog", Font.BOLD, 12));
-		table.setBorder(new LineBorder(new Color (0, 0, 0)));
+		table.setFont(new Font ("Dialog", Font.BOLD, 12));
+		table.setBorder (new LineBorder(new Color (0, 0, 0)));
 		table.setModel (model);
 		contentPane.add (table);
 		contentPane.add (new JScrollPane (table));
@@ -103,7 +112,29 @@ public class MainWindow extends JFrame
 		panel_6.add (addVelocityButton);
 		JPanel panel_7 = new JPanel ();
 		panel_4.add (panel_7);
-		panel_7.setLayout (new GridLayout (1, 0, 0, 0));
+		panel_7.setLayout (new GridLayout (0, 2, 0, 0));
+		executionsLabel = new JLabel ("Conteo de ejecuciones:");
+		panel_7.add (executionsLabel);
+		panel_8 = new JPanel ();
+		panel_3.add (panel_8);
+		panel_8.setLayout (new GridLayout (0, 2, 0, 0));		
+		panel_9 = new JPanel ();
+		panel_9.setBorder (new TitledBorder (null, "Importar procesos", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_8.add (panel_9);		
+		panel_9.setLayout (new GridLayout (0, 3, 0, 50));		
+		panel_10 = new JPanel ();
+		panel_9.add (panel_10);				
+		lblNewLabel = new JLabel ("Documento XML:");
+		panel_10.add (lblNewLabel);		
+		panel_11 = new JPanel ();
+		panel_9.add (panel_11);		
+		xmlField = new JTextField ();
+		panel_11.add (xmlField);
+		xmlField.setColumns (10);		
+		panel_12 = new JPanel ();
+		panel_9.add (panel_12);
+		importButton = new JButton ("Importar");
+		panel_12.add (importButton);
 	}
 
 	public JTable getTable () 
@@ -154,5 +185,20 @@ public class MainWindow extends JFrame
 	public JProgressBar getProgressBar ()
 	{
 		return progressBar;
+	}
+	
+	public JLabel getExecutionsLabel ()
+	{
+		return executionsLabel;
+	}
+	
+	public JButton getImportButton ()
+	{
+		return importButton;
+	}
+	
+	public JTextField getXmlField ()
+	{
+		return xmlField;
 	}
 }

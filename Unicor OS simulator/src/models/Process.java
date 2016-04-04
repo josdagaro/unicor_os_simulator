@@ -2,9 +2,6 @@ package models;
 
 import java.io.IOException;
 
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
-
 public class Process
 {
 	private int pid; //identificación del proceso	
@@ -12,6 +9,9 @@ public class Process
 	private float quantum; //tiempo en segundos en uso CPU
 	private Activity activity; /*actividad del proceso, contiene ruta fuente (copiado) y destino (pegado)
 	 							 como también las funciones necesarias para realizar dicha tarea*/
+	private int arrivalTime; //tiempo de llegada del proceso
+	private boolean came; //verifica si el proceso ya tuvo su llegada
+	private int executions;
 
 	public Process (int pid, String name, float quantum, Activity activity)
 	{
@@ -20,6 +20,9 @@ public class Process
 		setName (name); //metodos setName () y getName () heredados de la clase Thread
 		setQuantum (quantum);
 		setActivity (activity);
+		setArrivalTime (0);
+		setExecutions (0);
+		came = false;		
 	}
 
 	public void setPid (int pid)
@@ -41,12 +44,27 @@ public class Process
 	{
 		this.activity = activity;
 	}
+	
+	public void setArrivalTime (int arrivalTime)
+	{
+		this.arrivalTime = arrivalTime;
+	}
+	
+	public void setExecutions (int executions)
+	{
+		this.executions = executions;
+	}
+	
+	public void itCame ()
+	{
+		came = true;
+	}	
 
 	public int getPid ()
 	{
 		return pid;
 	}	
-
+	
 	public String getName ()
 	{
 		return name;
@@ -61,11 +79,31 @@ public class Process
 	{
 		return activity;
 	}
+	
+	public int getArrivalTime ()
+	{
+		return arrivalTime;
+	}
+	
+	public boolean alreadyItCame ()
+	{
+		return came;
+	}
+	
+	public int getExecutions ()
+	{
+		return executions;
+	}
+	
+	public int getTotalExecutions (int velocity) throws IOException
+	{
+		return (int) Math.ceil ((getRafagaTime (velocity) / 1000) / getQuantum ());
+	}
 
-	public void executeActivity (int velocity, JProgressBar progressBar, JLabel progressLabel) throws IOException, 
+	public void executeActivity (int velocity, views.MainWindow mainWindow) throws IOException, 
 	InterruptedException
 	{
-		getActivity ().copyAndPaste (getName (), velocity, getQuantum (), progressBar, progressLabel);		
+		getActivity ().copyAndPaste (getName (), velocity, getQuantum (), mainWindow);		
 	}
 
 	public float getRafagaTime (int velocity) throws IOException
