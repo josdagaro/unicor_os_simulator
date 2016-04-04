@@ -135,6 +135,7 @@ public class MainWindow extends JFrame
 		panel_9.add (panel_12);
 		importButton = new JButton ("Importar");
 		panel_12.add (importButton);
+		setDefaultLookAndFeelDecorated (true);
 	}
 
 	public JTable getTable () 
