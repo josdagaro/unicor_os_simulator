@@ -344,7 +344,7 @@ public class MainWindow implements ActionListener
 		}
 	}
 	
-	private void importData () throws SAXException, IOException, ParserConfigurationException
+	private void importData () throws SAXException, IOException, ParserConfigurationException //función para importar documento XML
 	{	
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance ();
 		DocumentBuilder builder = factory.newDocumentBuilder ();
