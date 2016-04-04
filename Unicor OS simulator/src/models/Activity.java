@@ -13,7 +13,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 	private String destinationPath; //ruta del archivo destino en el cual se van a pegar los caracteres
 	private Task task; //Hilo que realizará el copiado y pegado
 	
-	public Activity (String rootPath, String destinationPath) 
+	public Activity (String rootPath, String destinationPath)
 	{
 		setRootPath (rootPath);
 		setDestinationPath (destinationPath);
@@ -113,7 +113,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 		return text;
 	}
 	
-	public void copyAndPaste (String name, int velocity, float quantum, views.MainWindow mainWindow) throws IOException, 	
+	public void copyAndPaste (String name, int velocity, float quantum, views.MainWindow mainWindow, Manager manager) throws IOException, 	
 	InterruptedException
 	{				
 		String text = readRootFile ();
@@ -130,7 +130,7 @@ public class Activity /*recibe el nombre ya que es una clase diseñada solo para
 			rafaga = size * velocity;
 			letters = text.toCharArray ();
 			writer = new FileWriter (destinationFile);
-			task.init (name, size, writer, limit, letters, mainWindow, rafaga, velocity);
+			task.init (name, size, writer, limit, letters, mainWindow, rafaga, velocity, manager);
 			task.start ();
 		}
 	}

@@ -42,6 +42,8 @@ public class MainWindow extends JFrame
 	private JTextField xmlField;
 	private JPanel panel_12;
 	private JLabel lblNewLabel;
+	private JPanel panel_13;
+	private JButton viewButton;
 	
 	/**
 	 * Create the frame.
@@ -134,7 +136,11 @@ public class MainWindow extends JFrame
 		panel_12 = new JPanel ();
 		panel_9.add (panel_12);
 		importButton = new JButton ("Importar");
-		panel_12.add (importButton);
+		panel_12.add (importButton);		
+		panel_13 = new JPanel ();
+		panel_8.add (panel_13);		
+		viewButton = new JButton ("Graficar resultados");
+		panel_13.add (viewButton);
 		setDefaultLookAndFeelDecorated (true);
 	}
 
@@ -201,5 +207,10 @@ public class MainWindow extends JFrame
 	public JTextField getXmlField ()
 	{
 		return xmlField;
+	}
+	
+	public JButton getViewButton ()
+	{
+		return viewButton;
 	}
 }

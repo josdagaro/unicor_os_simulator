@@ -18,10 +18,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import libraries.Global;
 import models.Activity;
 import models.FileSelector;
 import models.Manager;
+import sources.Global;
+import views.RafagaTimeGraph;
+import views.TurnAroundGraph;
 
 public class MainWindow implements ActionListener
 {
@@ -37,7 +39,7 @@ public class MainWindow implements ActionListener
 	
 	private enum mainWindowComponents
 	{
-		toggleButton, rebootButton, createButton, addVelocityButton, importButton
+		toggleButton, rebootButton, createButton, addVelocityButton, importButton, viewButton
 	}
 	
 	private void initForm ()
@@ -47,16 +49,19 @@ public class MainWindow implements ActionListener
 		mainWindow.getToggleButton ().setEnabled (false);
 		mainWindow.getCreateButton ().setEnabled (false);
 		mainWindow.getXmlField ().setEnabled (false);
+		mainWindow.getViewButton ().setEnabled (false);
 		mainWindow.getToggleButton ().setActionCommand ("toggleButton");
 		mainWindow.getRebootButton ().setActionCommand ("rebootButton");
 		mainWindow.getCreateButton ().setActionCommand ("createButton");
 		mainWindow.getAddVelocityButton ().setActionCommand ("addVelocityButton");
 		mainWindow.getImportButton ().setActionCommand ("importButton");
+		mainWindow.getViewButton ().setActionCommand ("viewButton");
 		mainWindow.getToggleButton ().addActionListener (this);
 		mainWindow.getRebootButton ().addActionListener (this);
 		mainWindow.getCreateButton ().addActionListener (this);
 		mainWindow.getAddVelocityButton ().addActionListener (this);
 		mainWindow.getImportButton ().addActionListener (this);
+		mainWindow.getViewButton ().addActionListener (this);
 	}
 
 	@Override
@@ -186,6 +191,14 @@ public class MainWindow implements ActionListener
 				
 				chooseFile (mainWindow.getXmlField ());				
 				break;
+				
+			case viewButton:
+				
+				RafagaTimeGraph rafagaTimeGraph = new RafagaTimeGraph ();
+				rafagaTimeGraph.show (mainWindow.getTable ());	
+				TurnAroundGraph turnAroundGraph = new TurnAroundGraph ();
+				turnAroundGraph.MostrarTR (manager);
+				break;
 		}
 	}
 	
@@ -253,7 +266,7 @@ public class MainWindow implements ActionListener
 					if (!manager.getExecution ().getActivity ().getTask ().isSuspended ())
 					{
 						System.out.println ("Se inicia nueva tarea");							
-						manager.getExecution ().executeActivity (manager.getVelocity (), mainWindow);	
+						manager.getExecution ().executeActivity (manager.getVelocity (), mainWindow, manager);	
 					}
 					else
 					{
@@ -299,35 +312,36 @@ public class MainWindow implements ActionListener
 		System.out.println ("Fin del controlador main window");
 		mainWindow.getToggleButton ().setText ("Iniciar");
 		mainWindow.getToggleButton ().setEnabled (false);
+		mainWindow.getViewButton ().setEnabled (true);
 	}
 	
-	private void modifyStateInTable (int pid, String state, int arrivalTime) throws InterruptedException
+	private void modifyStateInTable (int pid, String state, int arrivalTime) throws InterruptedException //se recorren las filas de la tabla
 	{
 		int size = mainWindow.getTable ().getRowCount ();
 		
 		for (int i = 0; i < size; i ++)
 		{
-			if (pid == (int) mainWindow.getTable ().getValueAt (i, 0))
+			if (pid == (int) mainWindow.getTable ().getValueAt (i, 0)) //i es la fila y el segundo parametro es la columna
 			{				
 				mainWindow.getTable ().setValueAt (state, i, 4);
 				
 				if (state.equals ("Ejecución"))
 				{
-					mainWindow.getTable ().getCellRenderer(i, 4).getTableCellRendererComponent 
+					mainWindow.getTable ().getCellRenderer (i, 4).getTableCellRendererComponent 
 					(
 						mainWindow.getTable (), state, false, false, i, 4
-					).setBackground (Color.cyan);
+					).setBackground (Color.cyan);										
 				}
 				else if (state.equals ("Detenido"))
 				{
-					mainWindow.getTable ().getCellRenderer(i, 4).getTableCellRendererComponent 
+					mainWindow.getTable ().getCellRenderer (i, 4).getTableCellRendererComponent 
 					(
 						mainWindow.getTable (), state, false, false, i, 4
 					).setBackground (Color.red);
 				}
 				else if (state.equals ("Terminado"))
 				{
-					mainWindow.getTable ().getCellRenderer(i, 4).getTableCellRendererComponent 
+					mainWindow.getTable ().getCellRenderer (i, 4).getTableCellRendererComponent 
 					(
 						mainWindow.getTable (), state, false, false, i, 4
 					).setBackground (Color.green);

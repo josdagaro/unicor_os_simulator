@@ -1,4 +1,4 @@
-package libraries;
+package sources;
 
 public class Global 
 {

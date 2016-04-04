@@ -12,10 +12,9 @@ import models.Activity;
 import models.FileSelector;
 import models.Manager;
 import models.Process;
+import sources.Global;
 
 import javax.swing.table.DefaultTableModel;
-
-import libraries.Global;
 
 public class Form implements ActionListener, KeyListener
 {

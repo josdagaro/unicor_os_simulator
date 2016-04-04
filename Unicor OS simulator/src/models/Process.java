@@ -12,6 +12,7 @@ public class Process
 	private int arrivalTime; //tiempo de llegada del proceso
 	private boolean came; //verifica si el proceso ya tuvo su llegada
 	private int executions;
+	private float turnAround;
 
 	public Process (int pid, String name, float quantum, Activity activity)
 	{
@@ -23,6 +24,7 @@ public class Process
 		setArrivalTime (0);
 		setExecutions (0);
 		came = false;		
+		turnAround = 0;
 	}
 
 	public void setPid (int pid)
@@ -55,6 +57,11 @@ public class Process
 		this.executions = executions;
 	}
 	
+	public void setTurnAround (float turnAround)
+	{
+		this.turnAround = turnAround;
+	}
+	
 	public void itCame ()
 	{
 		came = true;
@@ -84,6 +91,10 @@ public class Process
 	{
 		return arrivalTime;
 	}
+	public float getTurnAround ()
+	{
+		return turnAround;
+	}
 	
 	public boolean alreadyItCame ()
 	{
@@ -100,10 +111,10 @@ public class Process
 		return (int) Math.ceil ((getRafagaTime (velocity) / 1000) / getQuantum ());
 	}
 
-	public void executeActivity (int velocity, views.MainWindow mainWindow) throws IOException, 
+	public void executeActivity (int velocity, views.MainWindow mainWindow, Manager manager) throws IOException, 
 	InterruptedException
 	{
-		getActivity ().copyAndPaste (getName (), velocity, getQuantum (), mainWindow);		
+		getActivity ().copyAndPaste (getName (), velocity, getQuantum (), mainWindow, manager);		
 	}
 
 	public float getRafagaTime (int velocity) throws IOException

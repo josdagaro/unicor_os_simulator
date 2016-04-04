@@ -144,15 +144,24 @@ public class Manager extends Thread
 						
 		while (!getReadyQueue ().isEmpty () || !getStopQueue ().isEmpty ())
 		{
-			if (!liberation && !getReadyQueue ().isEmpty ())
+			while (getExecution () == null)
 			{
-				setExecution (getReadyQueue ().poll ());												
+				if (!liberation && !getReadyQueue ().isEmpty ())
+				{			
+					System.out.println ("Toma uno listo");
+					setExecution (getReadyQueue ().poll ());												
+				}
+				else if (!getStopQueue ().isEmpty ())
+				{
+					System.out.println ("Toma uno detenido");
+					setExecution (getStopQueue ().poll ());
+					liberation = false;	
+				}
+				else
+				{
+					liberation = false;
+				}								
 			}
-			else if (!getStopQueue ().isEmpty ())
-			{
-				setExecution (getStopQueue ().poll ());
-				liberation = false;				
-			}		
 			
 			if (!getExecution ().alreadyItCame ())
 			{
