@@ -18,7 +18,7 @@ public class Process
 	{
 		super ();
 		setPid (pid);
-		setName (name); //metodos setName () y getName () heredados de la clase Thread
+		setName (name);
 		setQuantum (quantum);
 		setActivity (activity);
 		setArrivalTime (0);
